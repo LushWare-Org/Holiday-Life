@@ -1,0 +1,117 @@
+[{
+ "_id": {
+    "$oid": "67854de54df35aa9c98df605"
+  },
+  "title": "Brennia Kottefaru Maldives",
+  "days": 5,
+  "price": 1578,
+  "images": [
+    "https://i.postimg.cc/gjFW8vBC/1.jpg",
+    "https://i.postimg.cc/tTVbsrDd/2.jpg"
+  ],
+  "category": "Honeymoon"
+},
+{
+  "_id": {
+    "$oid": "67854de54df35aa9c98df606"
+  },
+  "title": "Sun Siyam Olhuveli Maldives",
+  "days": 4,
+  "price": 1495,
+  "images": [
+    "https://i.postimg.cc/QCQrbH2H/3.jpg",
+    "https://i.postimg.cc/9XZVVnDC/4.jpg"
+  ],
+  "category": "Honeymoon"
+},
+{
+  "_id": {
+    "$oid": "67854de54df35aa9c98df607"
+  },
+  "title": "Siyam World Maldives",
+  "days": 4,
+  "price": 1779,
+  "images": [
+    "https://i.postimg.cc/7YNkJJ1R/5.jpg",
+    "https://i.postimg.cc/VkGPDyVB/6.jpg"
+  ],
+  "category": "Honeymoon"
+},
+{
+  "_id": {
+    "$oid": "67854de54df35aa9c98df608"
+  },
+  "title": "Holiday Inn Kandooma Maldives",
+  "days": 4,
+  "price": 838,
+  "images": [
+    "https://i.postimg.cc/Jz4WN7Pz/7.jpg",
+    "https://i.postimg.cc/5tDdWB1X/8.jpg"
+  ],
+  "category": "Family"
+},
+{
+  "_id": {
+    "$oid": "67854de54df35aa9c98df609"
+  },
+  "title": "Island Fun and Relaxation",
+  "days": 5,
+  "price": 2200,
+  "images": [
+    "https://i.postimg.cc/TPKMs788/9.jpg",
+    "https://i.postimg.cc/kMQrLRH5/10.jpg"
+  ],
+  "category": "Family"
+},
+{
+  "_id": {
+    "$oid": "67854de54df35aa9c98df60a"
+  },
+  "title": "Underwater Family Experience",
+  "days": 7,
+  "price": 3000,
+  "images": [
+    "https://i.postimg.cc/MHbhBgBB/11.jpg",
+    "https://i.postimg.cc/rFjBwXMX/12.jpg"
+  ],
+  "category": "Family"
+},
+{
+  "_id": {
+    "$oid": "67854de54df35aa9c98df60b"
+  },
+  "title": "Luxury Overwater Getaway",
+  "days": 5,
+  "price": 4000,
+  "images": [
+    "https://i.postimg.cc/SxKwXTxX/13.jpg",
+    "https://i.postimg.cc/RZb2w7Wg/14.jpg"
+  ],
+  "category": "Luxury"
+},
+{
+  "_id": {
+    "$oid": "67854de54df35aa9c98df60c"
+  },
+  "title": "Exclusive Island Retreat",
+  "days": 6,
+  "price": 5000,
+  "images": [
+    "https://i.postimg.cc/FKd8pYcN/15.jpg",
+    "https://i.postimg.cc/Mp4rnzL4/16.jpg"
+  ],
+  "category": "Luxury"
+},
+{
+  "_id": {
+    "$oid": "67854de54df35aa9c98df60d"
+  },
+  "title": "Private Yacht Experience",
+  "days": 7,
+  "price": 6000,
+  "images": [
+    "https://i.postimg.cc/L8hb4JxL/17.jpg",
+    "https://i.postimg.cc/QxfzrQJj/18.jpg"
+  ],
+  "category": "Luxury"
+}]

@@ -1,0 +1,93 @@
+[
+      {
+        "title": "Romantic Overwater Escape",
+        "days": 5,
+        "price": 2500,
+        "images": [
+          "https://example.com/images/romantic-overwater-escape1.jpg",
+          "https://example.com/images/romantic-overwater-escape2.jpg"
+        ],
+        "category": "Honeymoon"
+      },
+      {
+        "title": "Sunset Serenity Package",
+        "days": 4,
+        "price": 1800,
+        "images": [
+          "https://example.com/images/sunset-serenity1.jpg",
+          "https://example.com/images/sunset-serenity2.jpg"
+        ],
+        "category": "Honeymoon"
+      },
+      {
+        "title": "Maldivian Romance Retreat",
+        "days": 7,
+        "price": 3200,
+        "images": [
+          "https://example.com/images/romance-retreat1.jpg",
+          "https://example.com/images/romance-retreat2.jpg"
+        ],
+        "category": "Honeymoon"
+      },
+      {
+        "title": "Family Adventure Paradise",
+        "days": 6,
+        "price": 2700,
+        "images": [
+          "https://example.com/images/family-adventure1.jpg",
+          "https://example.com/images/family-adventure2.jpg"
+        ],
+        "category": "Family"
+      },
+      {
+        "title": "Island Fun and Relaxation",
+        "days": 5,
+        "price": 2200,
+        "images": [
+          "https://example.com/images/island-fun1.jpg",
+          "https://example.com/images/island-fun2.jpg"
+        ],
+        "category": "Family"
+      },
+      {
+        "title": "Underwater Family Experience",
+        "days": 7,
+        "price": 3000,
+        "images": [
+          "https://example.com/images/underwater-family1.jpg",
+          "https://example.com/images/underwater-family2.jpg"
+        ],
+        "category": "Family"
+      },
+      {
+        "title": "Luxury Overwater Getaway",
+        "days": 5,
+        "price": 4000,
+        "images": [
+          "https://example.com/images/luxury-getaway1.jpg",
+          "https://example.com/images/luxury-getaway2.jpg"
+        ],
+        "category": "Luxury"
+      },
+      {
+        "title": "Exclusive Island Retreat",
+        "days": 6,
+        "price": 5000,
+        "images": [
+          "https://example.com/images/island-retreat1.jpg",
+          "https://example.com/images/island-retreat2.jpg"
+        ],
+        "category": "Luxury"
+      },
+      {
+        "title": "Private Yacht Experience",
+        "days": 7,
+        "price": 6000,
+        "images": [
+          "https://example.com/images/yacht-experience1.jpg",
+          "https://example.com/images/yacht-experience2.jpg"
+        ],
+        "category": "Luxury"
+      }
+    ]
+  

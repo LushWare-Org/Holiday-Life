@@ -1,0 +1,236 @@
+.container {
+    display: flex;
+    height: 100vh;
+    background-color: #caf0f8;
+    margin-top: 15px;
+  }
+  
+  .left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color:#caf0f8;
+  }
+
+  
+  .right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    max-height: 95vh;
+  }
+  
+  .formContainer {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .logo {
+    font-size: 30px;
+    color: black;
+    margin-bottom: 20px;
+  }
+  
+  .heading {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .subtext {
+    color: #6b6b6b;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .passwordField {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  .icon {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+    color: #888;
+  }
+  
+.loginButton {
+  width: 100%;
+  padding: 14px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.loginButton:hover {
+  background-color: #333;
+  transform: scale(1.03);
+}
+
+.login-center-options {
+  display: flex;
+  justify-content: space-between; /* Distribute the elements evenly */
+  align-items: center; /* Vertically align the items */
+  width: 100%; 
+  margin-top: 10px; 
+}
+
+.remember-div {
+  display: flex;
+  align-items: center; /* Align checkbox and label horizontally */
+}
+
+.forgot-pass-link {
+  color: #007bff; 
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.forgot-pass-link:hover {
+  text-decoration: underline; 
+}
+
+
+  .googleButton {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    color: #6b6b6b;
+    transition: transform 0.2s, background-color 0.3s;
+  }
+  
+  .googleButton:hover {
+    background-color: #e8e8e8;
+    transform: scale(1.03);
+  }
+  
+  .facebookButton {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    background-color: #3b5998;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.2s, background-color 0.3s;
+  }
+  
+  .facebookButton:hover {
+    background-color: #324b84;
+    transform: scale(1.03);
+  }
+  
+  .socialIcon {
+    width: 20px;
+    margin-right: 10px;
+  }
+  
+  .link {
+    color: #6b6b6b;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+/* Media Query for Mobile Devices */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* Stack left and right sections vertically */
+    height: auto;
+    margin-top: 0;
+  }
+
+  .left, .right {
+    flex: none;
+    width: 100%; /* Full width for both sections */
+    min-height: 50vh; /* Adjust height to take half of the viewport */
+  }
+
+  .left {
+    display: none; /* Hide the left section (image slider) for smaller screens */
+  }
+
+  .formContainer {
+    padding: 20px;
+  }
+
+  .input {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .passwordField .icon {
+    right: 8px;
+  }
+
+  .loginButton, .googleButton, .facebookButton {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .login-center-options {
+    flex-direction: column; /* Stack elements vertically */
+    align-items: flex-start; /* Align elements to the start */
+    gap: 10px; /* Add spacing between elements */
+  }
+
+  .remember-div label {
+    font-size: 14px; /* Adjust font size for labels */
+  }
+
+  .forgot-pass-link {
+    font-size: 12px; /* Adjust font size for smaller screens */
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+
+  .subtext {
+    font-size: 14px;
+  }
+
+  .socialIcon {
+    width: 18px;
+  }
+}
+
+
+
+
+  
