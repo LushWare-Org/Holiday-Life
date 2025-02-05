@@ -55,7 +55,7 @@ const ImageGallery = ( {searchQuery = ''}) => {
   useEffect(() => {
     const fetchTours = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/tours'); // Replace with your API endpoint
+        const response = await axios.get('/api/tours'); // Replace with your API endpoint
         setTours(response.data);
         setLoading(false);
       } catch (err) {
