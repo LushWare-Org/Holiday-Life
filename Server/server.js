@@ -13,8 +13,8 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: "http://localhost:3000", // Your frontend URL
-  methods: ["GET", "POST"], // Allowed methods
+  origin: "http://lushtravels.site", // Your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
 }));
 
