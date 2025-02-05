@@ -70,7 +70,7 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchTours = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/tours'); // Replace with your API endpoint
+        const response = await axios.get('/tours'); // Replace with your API endpoint
         setTours(response.data.slice(0, 3)); // Fetch only the first 3 tours
         setLoading(false);
       } catch (err) {
@@ -130,7 +130,7 @@ const HomeScreen = () => {
         tour_id: selectedTour._id,
       };
 
-      await axios.post('http://localhost:8000/api/inquiries', payload);
+      await axios.post('/inquiries', payload);
       Swal.fire('Success!', 'Your inquiry has been submitted successfully.', 'success');
       handleCloseDialog();
     } catch (error) {

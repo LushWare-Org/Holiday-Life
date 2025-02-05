@@ -63,7 +63,7 @@ const TourDetails = () => {
   useEffect(() => {
     const fetchTourDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/tours/${id}`); 
+        const response = await axios.get(`/tours/${id}`); 
         setTour(response.data);
         setLoading(false);
       } catch (error) {
@@ -114,7 +114,7 @@ const TourDetails = () => {
       };
 
       const response = await axios.post(
-        'http://localhost:8000/api/inquiries',
+        '/inquiries',
         payload
       );
       Swal.fire({

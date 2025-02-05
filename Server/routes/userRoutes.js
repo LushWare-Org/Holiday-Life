@@ -90,7 +90,7 @@ router.get(
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
       // Send token and user details
-      res.redirect(`http://localhost:3000/dashboard?token=${token}`);
+      res.redirect(`http://lushtravels.site/dashboard?token=${token}`);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Social login failed' });

@@ -34,10 +34,10 @@ app.use(passport.session());
 app.options("*", cors());
 
 
-app.use('/api/tours', tourRoutes);
-app.use('/api/inquiries', inquireRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/contact', contactRoutes);
+app.use('/tours', tourRoutes);
+app.use('/inquiries', inquireRoutes);
+app.use('/users', userRoutes);
+app.use('/contact', contactRoutes);
 
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://shalini:Shalini%40LWD%40HL@cluster0.grvd0.mongodb.net/travel-website', { useNewUrlParser: true, useUnifiedTopology: true })

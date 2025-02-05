@@ -36,7 +36,7 @@ const ContactUsForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/contact",
+        "/contact",
         formData
     );
 

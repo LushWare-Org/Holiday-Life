@@ -40,7 +40,7 @@ const Itinerary = () => {
     const fetchTourData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8000/api/tours/${id}`);
+        const response = await axios.get(`/tours/${id}`);
         setTourData(response.data);
 
         const totalDays = response.data.nights + 1; 
