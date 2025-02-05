@@ -13,14 +13,13 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: "http://lushtravels.site", // Your frontend URL
+  origin: "http://lushtravels.site", // Your frontend
   methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
 }));
 
 app.use(express.json());
 
-// Enable session for passport
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your_session_secret',
   resave: false,
