@@ -63,8 +63,20 @@ const HomeScreen = () => {
   const { currency } = useCurrency(); 
 
   const convertPrice = (priceInUSD) => {
-    if (!exchangeRates[currency]) return priceInUSD.toLocaleString();
-    return (priceInUSD * exchangeRates[currency]).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (priceInUSD === undefined || priceInUSD === null || isNaN(priceInUSD)) {
+      return '';
+    }
+  
+    
+    if (!exchangeRates[currency]) {
+      return Number(priceInUSD).toLocaleString();
+    }
+    
+    const convertedValue = Number(priceInUSD) * exchangeRates[currency];
+    return convertedValue.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   };
 
   useEffect(() => {
