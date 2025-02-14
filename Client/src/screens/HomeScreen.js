@@ -24,6 +24,105 @@ import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import { useCurrency } from './CurrencyContext'; 
 
+import Autocomplete from '@mui/material/Autocomplete';
+
+
+export const countryCodes = [
+  { code: "+1", label: "🇺🇸" },
+  { code: "+44", label: "🇬🇧" },
+  { code: "+91", label: "🇮🇳" },
+  { code: "+61", label: "🇦🇺" },
+  { code: "+49", label: "🇩🇪" },
+  { code: "+33", label: "🇫🇷" },
+  { code: "+81", label: "🇯🇵" },
+  { code: "+86", label: "🇨🇳" },
+  { code: "+971", label: "🇦🇪" },
+  { code: "+7", label: "🇷🇺" },
+  { code: "+55", label: "🇧🇷" },
+  { code: "+34", label: "🇪🇸" },
+  { code: "+39", label: "🇮🇹" },
+  { code: "+82", label: "🇰🇷" },
+  { code: "+92", label: "🇵🇰" },
+  { code: "+90", label: "🇹🇷" },
+  { code: "+27", label: "🇿🇦" },
+  { code: "+234", label: "🇳🇬" },
+  { code: "+20", label: "🇪🇬" },
+  { code: "+351", label: "🇵🇹" },
+  { code: "+31", label: "🇳🇱" },
+  { code: "+46", label: "🇸🇪" },
+  { code: "+41", label: "🇨🇭" },
+  { code: "+32", label: "🇧🇪" },
+  { code: "+43", label: "🇦🇹" },
+  { code: "+47", label: "🇳🇴" },
+  { code: "+45", label: "🇩🇰" },
+  { code: "+380", label: "🇺🇦" },
+  { code: "+66", label: "🇹🇭" },
+  { code: "+65", label: "🇸🇬" },
+  { code: "+64", label: "🇳🇿" },
+  { code: "+63", label: "🇵🇭" },
+  { code: "+60", label: "🇲🇾" },
+  { code: "+62", label: "🇮🇩" },
+  { code: "+58", label: "🇻🇪" },
+  { code: "+57", label: "🇨🇴" },
+  { code: "+56", label: "🇨🇱" },
+  { code: "+52", label: "🇲🇽" },
+  { code: "+51", label: "🇵🇪" },
+  { code: "+48", label: "🇵🇱" },
+  { code: "+40", label: "🇷🇴" },
+  { code: "+420", label: "🇨🇿" },
+  { code: "+36", label: "🇭🇺" },
+  { code: "+98", label: "🇮🇷" },
+  { code: "+212", label: "🇲🇦" },
+  { code: "+213", label: "🇩🇿" },
+  { code: "+216", label: "🇹🇳" },
+  { code: "+94", label: "🇱🇰" },
+  { code: "+880", label: "🇧🇩" },
+  { code: "+972", label: "🇮🇱" },
+  { code: "+353", label: "🇮🇪" },
+  { code: "+354", label: "🇮🇸" },
+  { code: "+505", label: "🇳🇮" },
+  { code: "+509", label: "🇭🇹" },
+  { code: "+93", label: "🇦🇫" },
+  { code: "+995", label: "🇬🇪" },
+  { code: "+374", label: "🇦🇲" },
+  { code: "+993", label: "🇹🇲" },
+  { code: "+998", label: "🇺🇿" },
+  { code: "+675", label: "🇵🇬" },
+  { code: "+679", label: "🇫🇯" },
+  { code: "+676", label: "🇹🇴" },
+  { code: "+960", label: "🇲🇻" },
+  { code: "+248", label: "🇸🇨" },
+  { code: "+267", label: "🇧🇼" },
+  { code: "+254", label: "🇰🇪" },
+  { code: "+255", label: "🇹🇿" },
+  { code: "+256", label: "🇺🇬" },
+  { code: "+233", label: "🇬🇭" },
+  { code: "+225", label: "🇨🇮" },
+  { code: "+221", label: "🇸🇳" },
+  { code: "+218", label: "🇱🇾" },
+  { code: "+964", label: "🇮🇶" },
+  { code: "+967", label: "🇾🇪" },
+  { code: "+965", label: "🇰🇼" },
+  { code: "+966", label: "🇸🇦" },
+  { code: "+973", label: "🇧🇭" },
+  { code: "+974", label: "🇶🇦" },
+  { code: "+968", label: "🇴🇲" },
+  { code: "+961", label: "🇱🇧" },
+  { code: "+963", label: "🇸🇾" },
+  { code: "+249", label: "🇸🇩" },
+  { code: "+211", label: "🇸🇸" },
+  { code: "+975", label: "🇧🇹" },
+  { code: "+977", label: "🇳🇵" },
+  { code: "+856", label: "🇱🇦" },
+  { code: "+855", label: "🇰🇭" },
+  { code: "+852", label: "🇭🇰" },
+  { code: "+853", label: "🇲🇴" },
+  { code: "+373", label: "🇲🇩" },
+  { code: "+381", label: "🇷🇸" },
+  { code: "+382", label: "🇲🇪" },
+  { code: "+389", label: "🇲🇰" },
+];
+
 
 function useDeviceType() {
   const [deviceType, setDeviceType] = useState({
@@ -61,6 +160,8 @@ const HomeScreen = () => {
   const [message, setMessage] = useState('');
   const [exchangeRates, setExchangeRates] = useState({});
   const { currency } = useCurrency(); 
+
+  
 
   const convertPrice = (priceInUSD) => {
     if (priceInUSD === undefined || priceInUSD === null || isNaN(priceInUSD)) {
@@ -463,7 +564,7 @@ const HomeScreen = () => {
                     }}
                   >
                     {selectedTour?.price
-                      ? `${currency} ${Number(selectedTour.price).toLocaleString()}`
+                      ? `${currency} ${selectedTour.price && !isNaN(selectedTour.price) ? convertPrice(selectedTour.price) : ''}`
                       : 'Price not available'}
                   </Typography>
                   {selectedTour?.oldPrice && (
@@ -475,7 +576,7 @@ const HomeScreen = () => {
                         fontSize: '0.9rem',
                       }}
                     >
-                      {currency} {Number(selectedTour.oldPrice).toLocaleString()}
+                      {currency} {selectedTour.oldPrice && !isNaN(selectedTour.oldPrice) ? convertPrice(selectedTour.oldPrice) : ''}
                     </Typography>
                   )}
                   {selectedTour?.price && selectedTour?.oldPrice && (
@@ -490,7 +591,7 @@ const HomeScreen = () => {
                         fontWeight: 'bold',
                       }}
                     >
-                      SAVE {currency} {Number(selectedTour.oldPrice - selectedTour.price).toLocaleString()}
+                      SAVE {currency} {convertPrice(selectedTour.oldPrice-selectedTour.price)}
                     </Typography>
                   )}
                 </Box>
@@ -517,10 +618,18 @@ const HomeScreen = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
           <Box sx={{ display: 'flex', gap: '8px', mt: 2 }}>
-            <TextField
-              label="country code"
-              sx={{ width: '100px' }}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+            <Autocomplete
+              options={countryCodes}
+              getOptionLabel={(option) => `${option.label} ${option.code}`}
+              renderOption={(props, option) => (
+                <Box component="li" {...props} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography>{option.label}</Typography>
+                  <Typography>{option.code}</Typography>
+                </Box>
+              )}
+              renderInput={(params) => <TextField {...params} label="Country Code" />}
+              onChange={(event, newValue) => setPhoneNumber(newValue ? newValue.code : '')}
+              sx={{ width: '200px' }}
             />
             <TextField
               required
