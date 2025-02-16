@@ -226,6 +226,10 @@ const HomeScreen = () => {
     navigate('/tours'); 
   };
 
+  const handleNavigateToTour = (tourId) => {
+    navigate(`/tours/${tourId}`);
+  };
+
   const handleWhatsAppClick = () => {
     const whatsappUrl = `https://wa.me/9607699699`;
     window.open(whatsappUrl, '_blank');
@@ -424,6 +428,7 @@ const HomeScreen = () => {
                       backgroundColor: '#fff',
                       boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
                     }}
+                    onClick={() => handleNavigateToTour(tour._id)}
                   >
                     <img
                       src={tour.tour_image}
