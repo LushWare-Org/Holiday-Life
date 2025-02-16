@@ -51,7 +51,7 @@ const TourInquiries = () => {
   const fetchInquiries = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/inquiries');
+      const response = await fetch('/inquiries');
       if (!response.ok) throw new Error('Failed to fetch inquiries.');
       const data = await response.json();
 
@@ -77,7 +77,7 @@ const TourInquiries = () => {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`/api/inquiries/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/inquiries/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete inquiry.');
       message.success('Inquiry deleted successfully.');
       fetchInquiries();
@@ -95,7 +95,7 @@ const TourInquiries = () => {
     }
 
     try {
-      const response = await fetch('/api/inquiries/reply', {
+      const response = await fetch('/inquiries/reply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

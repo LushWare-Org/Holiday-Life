@@ -22,7 +22,7 @@ const AllTours = () => {
   useEffect(() => {
     const fetchTours = async () => {
       try {
-        const response = await axios.get("/api/tours");
+        const response = await axios.get("/tours");
         setTours(response.data);
       } catch (error) {
         console.error("Error fetching tours:", error);
@@ -194,7 +194,7 @@ const AllTours = () => {
         itinerary_titles: formData.itineraryTitles,
       };
 
-      const response = await axios.put(`/api/tours/${editTour._id}`, payload);
+      const response = await axios.put(`/tours/${editTour._id}`, payload);
 
       if (response.status === 200) {
         Swal.fire("Success!", "Tour has been updated successfully.", "success");
@@ -228,7 +228,7 @@ const AllTours = () => {
   
       // If user clicks 'Yes, delete it!'
       if (result.isConfirmed) {
-        const response = await axios.delete(`/api/tours/${id}`);
+        const response = await axios.delete(`/tours/${id}`);
         if (response.status === 200) {
           // Update the UI by filtering out the deleted tour
           setTours(tours.filter((tour) => tour._id !== id));

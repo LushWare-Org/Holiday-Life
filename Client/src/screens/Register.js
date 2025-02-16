@@ -36,7 +36,7 @@ const Signup = () => {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const token = localStorage.getItem('token');
     try{
-      axios.get(`/api/users/${user.id}`).then((res) => {
+      axios.get(`/users/${user.id}`).then((res) => {
         console.log(token.id)
         if (res.data.isAdmin) {
           console.log(res.data)

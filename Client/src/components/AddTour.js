@@ -244,7 +244,7 @@ const TourForm = () => {
         itinerary_titles: formData.itineraryTitles,
       };
 
-      const response = await fetch("/api/tours", {
+      const response = await fetch("/tours", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

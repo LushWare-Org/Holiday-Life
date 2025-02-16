@@ -43,7 +43,7 @@ const ContactInquiries = () => {
   const fetchInquiries = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/contact/inquiries');
+      const response = await fetch('/contact/inquiries');
       if (!response.ok) throw new Error('Failed to fetch inquiries.');
       const data = await response.json();
       setInquiries(data);
@@ -60,7 +60,7 @@ const ContactInquiries = () => {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`/api/contact/inquiries/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/contact/inquiries/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete inquiry.');
       message.success('Inquiry deleted successfully.');
       fetchInquiries();
@@ -78,7 +78,7 @@ const ContactInquiries = () => {
     }
 
     try {
-      const response = await fetch('/api/contact/reply', {
+      const response = await fetch('/contact/reply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
