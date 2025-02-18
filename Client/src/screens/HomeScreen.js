@@ -257,8 +257,6 @@ const HomeScreen = () => {
 
   return (
     <div style={{ backgroundColor: '#caf0f8' }}>
-      <LiveChat />
-
       <Box bgcolor="#ffffff" padding={isMobile ? '10px' : '35px'} mt="30px" minWidth='98vw' marginTop={'1px'}><br></br>
         <div style={{ display: 'flex', flexDirection: isMobile || isTablet? 'column' : 'row' , marginBottom: '30px' }}>
           {/* Left Block: Image */}
@@ -715,6 +713,23 @@ const HomeScreen = () => {
       <FAQAccordion/>
       <Experience /><br></br><br></br>
       <Footer />
+
+      <IconButton
+        onClick={handleWhatsAppClick}
+        sx={{
+          position: 'fixed',
+          bottom: 16,
+          right: 16,
+          backgroundColor: '#25D366',
+          color: '#fff',
+          '&:hover': {
+            backgroundColor: '#128C7E',
+          },
+          zIndex: 1000,
+        }}
+      >
+        <WhatsAppIcon />
+      </IconButton>
     </div>
   );
 };

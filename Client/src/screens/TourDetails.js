@@ -11,6 +11,7 @@ import { Dialog, DialogActions, DialogContent, IconButton, TextField, Autocomple
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
 import { useCurrency } from './CurrencyContext';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
 export const countryCodes = [
   { code: "+1", label: "🇺🇸" },
@@ -155,6 +156,10 @@ const TourDetails = () => {
     return (priceInUSD * exchangeRates[currency]).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
+  const handleWhatsAppClick = () => {
+    const whatsappUrl = `https://wa.me/9607699699`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   useEffect(() => {
     const fetchTourDetails = async () => {
@@ -595,6 +600,23 @@ const TourDetails = () => {
         </div>
       </Box>
       <Footer />
+
+      <IconButton
+        onClick={handleWhatsAppClick}
+        sx={{
+          position: 'fixed',
+          bottom: 16,
+          right: 16,
+          backgroundColor: '#25D366',
+          color: '#fff',
+          '&:hover': {
+            backgroundColor: '#128C7E',
+          },
+          zIndex: 1000,
+        }}
+      >
+        <WhatsAppIcon />
+      </IconButton>
     </>
   );
 };
