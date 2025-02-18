@@ -7,6 +7,7 @@ import TourInquiries from '../components/TourInquiries';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 function useDeviceType() {
   const [deviceType, setDeviceType] = useState({
@@ -36,21 +37,21 @@ const AdminPanel = () => {
   const { isMobile, isTablet } = useDeviceType();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('currentUser'));
     const token = localStorage.getItem('token');
     try{
-      axios.get(`/users/${user.id}`).then((res) => {
-        console.log(token.id)
-        if (res.data.isAdmin) {
-          console.log(res.data)
-          return;
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        if (decodedToken.exp < Date.now() / 1000) {
+          navigate('/login');
         }
+      }
+      else {
         navigate('/login');
-      });
+      }
     } catch (error) { 
       navigate('/login');
     }
-  }, []);
+  }, [ ]);
 
 
 

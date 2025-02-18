@@ -61,6 +61,12 @@ router.post('/login', async (req, res) => {
               isAdmin: user.isAdmin,
           },
       });
+
+      setTimeout(() => {
+        localStorage.removeItem('token');
+        console.log("Token removed after 1 hour");
+    }, 60 * 60 * 1000);
+    
   } catch (error) {
       console.error('Error during login:', error);
       res.status(500).json({ message: 'Server error during login' });

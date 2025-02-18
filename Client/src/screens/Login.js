@@ -42,7 +42,6 @@ const Login = () => {
 
       const { token, user } = response.data;
 
-      localStorage.setItem('currentUser', JSON.stringify(user));
       localStorage.setItem('token', token);
 
       setSnackbarType('success');

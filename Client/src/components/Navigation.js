@@ -25,6 +25,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import {jwtDecode} from 'jwt-decode';
 
 function useDeviceType() {
   const [deviceType, setDeviceType] = useState({
@@ -380,13 +381,28 @@ export const AccountTabContent = () => {
   const [user, setUser] = useState();
 
   useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    setUser(currentUser);
-  }, []);
+    const token = localStorage.getItem('token');
+    try{
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        if (decodedToken.exp < Date.now() / 1000) {
+          setUser(false) ;
+        }
+        else {
+          setUser(true);
+        }
+      }
+      else {
+        setUser(false);
+      }
+    } catch (error) { 
+      setUser(false);
+    }
+}, []);
 
   return (
       <TabContent
-        title={JSON.parse(localStorage.getItem('currentUser')) ? (JSON.parse(localStorage.getItem('currentUser')).isAdmin ? "Admin Dashboard" : "My Account") : "My Account"}
+      title={user ? "Admin Dashboard" : "My Account"}
         backgroundImage1= 'https://i.postimg.cc/jSMNZsyY/Untitled-design-1.png'
         backgroundImage2= 'https://i.postimg.cc/jSMNZsyY/Untitled-design-1.png'
       />
@@ -411,9 +427,24 @@ const Navigation = () => {
   const { isMobile, isTablet } = useDeviceType();
 
   useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    setUser(currentUser);
-  }, []);
+    const token = localStorage.getItem('token');
+      try{
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          if (decodedToken.exp < Date.now() / 1000) {
+            setUser(false) ;
+          }
+          else {
+            setUser(true);
+          }
+        }
+        else {
+          setUser(false);
+        }
+      } catch (error) { 
+        setUser(false);
+      }
+    }, []);
 
   useEffect(() => {
     // Highlight the correct tab depending on route
@@ -515,17 +546,7 @@ const Navigation = () => {
         </ListItemButton>
         <Divider />
 
-        {/* If user is logged in */}
-        {user && !user.isAdmin && (
-          <>
-            <ListItemButton component={Link} to="/account" onClick={() => setDrawerOpen(false)}>
-              <ListItemText primary="Account" />
-            </ListItemButton>
-            <Divider />
-          </>
-        )}
-
-        {user && user.isAdmin && (
+        {user && (
           <>
             <ListItemButton component={Link} to="/admin" onClick={() => setDrawerOpen(false)}>
               <ListItemText primary="Admin Panel" />
@@ -733,15 +754,7 @@ const Navigation = () => {
                 textColor="inherit"
                 TabIndicatorProps={{ style: { display: 'none' } }}
               >
-                {user && !user.isAdmin && (
-                  <Tab
-                    label="Account"
-                    component={Link}
-                    to="/account"
-                    style={{ fontWeight: 'bold', marginLeft: '2vw' }}
-                  />
-                )}
-                {user && user.isAdmin && (
+                {user && (
                   <Tab
                     label="Admin Panel"
                     component={Link}

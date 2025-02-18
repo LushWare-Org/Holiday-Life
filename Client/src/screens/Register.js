@@ -7,6 +7,7 @@ import "./Register.css";
 import Footer from "../components/Footer"; 
 import { Link } from 'react-router-dom';
 import { useEffect } from "react";
+import { jwtDecode } from 'jwt-decode';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -33,17 +34,17 @@ const Signup = () => {
   };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('currentUser'));
     const token = localStorage.getItem('token');
     try{
-      axios.get(`/users/${user.id}`).then((res) => {
-        console.log(token.id)
-        if (res.data.isAdmin) {
-          console.log(res.data)
-          return;
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        if (decodedToken.exp < Date.now() / 1000) {
+          navigate('/login');
         }
+      }
+      else {
         navigate('/login');
-      });
+      }
     } catch (error) { 
       navigate('/login');
     }
