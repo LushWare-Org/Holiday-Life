@@ -264,18 +264,35 @@ const TourDetails = () => {
         </Typography>
         {/* Days & Nights */}
         {isMobile && (
-          <Box style={{ alignItems: 'center', display: 'flex', justifyContent: 'center', columnGap: '5px' }}>
-            <Box className="inline-block bg-blue-700 py-3 px-3  w-full max-w-44 mb-8 shadow-xl text-center">
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              flexWrap: 'wrap', 
+              justifyContent: 'center', 
+              gap: 1, 
+              mb: 5
+            }}
+          >
+            {/* First Row - first two boxes */}
+            <Box sx={{ flexBasis: 'calc(50% - 6px)' }} className="bg-blue-700 py-3 px-0 shadow-xl text-center">
               <Typography className="text-white text-6xl font-[Playfair Display]">
                 {tour.nights + 1} Days / {tour.nights} Nights
               </Typography>
             </Box>
 
-            {/* Price */}
-            <Box className="inline-block bg-blue-700 py-3 w-full max-w-44 px-1 mb-8 shadow-xl text-center">
+            <Box sx={{ flexBasis: 'calc(50% - 6px)' }} className="bg-blue-700 py-3 px-1 shadow-xl text-center">
               <Typography className="text-white text-7xl font-[Domine]">
                 Price: {selectedCurrency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}
               </Typography>
+            </Box>
+
+            {/* Second Row - third box */}
+            <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+              <Box className="inline-block bg-gray py-3 px-5 mb-8 shadow-xl ml-2 border-red-500 border-2">
+                <Typography className="text-blue-950 text-6xl font-[Playfair Display]">
+                  Expire on {new Date(tour.expiry_date).toISOString().split("T")[0]}
+                </Typography>
+              </Box>
             </Box>
           </Box>
         )}
@@ -292,6 +309,13 @@ const TourDetails = () => {
                 Price: {selectedCurrency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}
               </Typography>
             </Box>  
+          )}
+          { !isMobile && (
+            <Box className="inline-block bg-blue-700 py-3 px-5 mb-8 shadow-xl">
+              <Typography className="text-white text-6xl font-[Playfair Display]">
+                Expire on {new Date(tour.expiry_date).toISOString().split("T")[0]}
+              </Typography>
+            </Box>
           )}
 
           <Button

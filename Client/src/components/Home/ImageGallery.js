@@ -133,11 +133,13 @@ const ImageGallery = ( {searchQuery = ''}) => {
   const nights = query.get('nights') || '';
   const days = query.get('days') || '';
   const country = query.get('country') || '';
+  const market = query.get('market') || '';
   const selectedCurrency = localStorage.getItem('selectedCurrency') || 'USD';
   const [search, setSearch] = useState(searchTerm);
   const [searchNights, setSearchNights] = useState(nights);
   const [searchDays, setSearchDays] = useState(days);
   const [searchCountry, setSearchCountry] = useState(country);
+  const [searchMarket, setSearchMarket] = useState('');
   const [exchangeRates, setExchangeRates] = useState({});
 
   const { isMobile, isTablet} = useDeviceType();
@@ -201,17 +203,45 @@ const ImageGallery = ( {searchQuery = ''}) => {
     setSearchNights(nights);
     setSearchDays(days);
     setSearchCountry(country);
-  }, [searchTerm, nights, days, country]);
+    setSearchMarket(market);
+  }, [searchTerm, nights, days, country, market]);
+
+  const marketMapping = {
+    1: 'Indian Market',
+    2: 'Chinese Market',
+    3: 'Asian Markets',
+    4: 'Middle East Markets',
+    5: 'Russia and CIS Markets',
+    6: 'All Markets'
+  };
   
+  // Also create the inverse for easy lookup
+  const marketMappingInverse = Object.fromEntries(
+    Object.entries(marketMapping).map(([key, value]) => [value, Number(key)])
+  );
+
   const filteredTours = tours.filter((tour) => {
     const searchDaysValue = searchDays ? parseInt(searchDays) : null;
     const searchNightsValue = searchNights ? parseInt(searchNights) : null;
+
+    const currentDate = new Date();
+    const tourExpiryDate = new Date(tour.expiry_date);
+
+    if (tourExpiryDate < currentDate) {
+      return false;
+    }
+    const marketMatch =
+      !searchMarket ||
+      Number(searchMarket) === 6 ||
+      (Array.isArray(tour.markets) && tour.markets.includes(Number(searchMarket)));
+    
   
     return (
       (!search || tour.title.toLowerCase().includes(search.toLowerCase())) &&
       (!searchNightsValue || tour.nights === searchNightsValue) &&
       (!searchDaysValue || tour.nights +1 === searchDaysValue) &&
-      (!searchCountry || tour.country.toLowerCase().includes(searchCountry.toLowerCase()))
+      (!searchCountry || tour.country.toLowerCase().includes(searchCountry.toLowerCase())) &&
+      marketMatch
     );
     });
 
@@ -222,7 +252,8 @@ const ImageGallery = ( {searchQuery = ''}) => {
       search,
       nights: searchNights,
       days: searchDays,
-      country: searchCountry
+      country: searchCountry,
+      markets: searchMarket,
     }).toString();
     navigate(`/imagegallery?${query}`);
   };
@@ -355,21 +386,17 @@ const ImageGallery = ( {searchQuery = ''}) => {
           value={searchCountry}
           onChange={(e) => setSearchCountry(e.target.value)}
         />
-        <IconButton
-          type="submit"
-          color="primary"
-          sx={{
-            padding: '10px 15px',
-            backgroundColor: '#2196F3',
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: '#1976D2',
-            },
-            alignSelf: { xs: 'center', sm: 'flex-start' }, // Center the button on mobile
+        <Autocomplete
+          options={Object.values(marketMapping)}
+          renderInput={(params) => (
+            <TextField {...params} label="Market" variant="outlined" />
+          )}
+          value={marketMapping[searchMarket] || ''}
+          onChange={(event, newValue) => {
+            setSearchMarket(marketMappingInverse[newValue] || '');
           }}
-        >
-          <SearchIcon />
-        </IconButton>
+          fullWidth
+        />
       </Box>
 
       <Grid container spacing={5}>
