@@ -182,9 +182,14 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const fetchTours = async () => {
+      const response = await axios.get('/tours');
       try {
-        const response = await axios.get('/tours'); // Replace with your API endpoint
-        setTours(response.data.slice(0, 3)); // Fetch only the first 3 tours
+        const currentDate = new Date();
+        const validTours = response.data.filter(tour => {
+          const tourExpiryDate = new Date(tour.expiry_date);
+          return tourExpiryDate >= currentDate;
+        });
+        setTours(validTours.slice(0, 3)); 
         setLoading(false);
       } catch (err) {
         console.error('Failed to fetch tours:', err);

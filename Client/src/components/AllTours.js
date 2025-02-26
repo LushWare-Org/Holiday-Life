@@ -10,6 +10,8 @@ const AllTours = () => {
     title: "",
     price: "",
     nights: "",
+    expiry_date: "",
+    markets: [],
     itinerary: {},
     itineraryImages: {},
     itineraryTitles: {},
@@ -33,11 +35,21 @@ const AllTours = () => {
   }, []);
 
   const handleEditOpen = (tour) => {
+    const formatDate = (date) => {
+      const d = new Date(date);
+      const month = `0${d.getMonth() + 1}`.slice(-2);
+      const day = `0${d.getDate()}`.slice(-2);
+      const year = d.getFullYear();
+      return `${year}-${month}-${day}`;
+    };
+
     setEditTour(tour);
     setFormData({
       title: tour.title,
       price: tour.price,
       nights: tour.nights,
+      expiry_date: formatDate(tour.expiry_date),
+      markets: tour.markets || [] ,
       itinerary: tour.itinerary || {},
       itineraryImages: tour.itinerary_images || {},
       itineraryTitles: tour.itinerary_titles || {},
@@ -54,6 +66,8 @@ const AllTours = () => {
       title: "",
       price: "",
       nights: "",
+      expiry_date: "",
+      markets: [],
       itinerary: {},
       itineraryImages: {},
       itineraryTitles: {},
@@ -160,6 +174,15 @@ const AllTours = () => {
       }
     }
   };
+
+  const marketMapping = {
+    1: 'Indian Market',
+    2: 'Chinese Market',
+    3: 'Asian Markets',
+    4: 'Middle East Markets',
+    5: 'Russia and CIS Markets',
+    6: 'All Markets'
+  };
   
 
   const handleRemoveImage = (fieldName, index, dayKey) => {
@@ -185,6 +208,8 @@ const AllTours = () => {
         title: formData.title,
         price: formData.price,
         nights: formData.nights,
+        expiry_date: formData.expiry_date,
+        markets: formData.markets,
         tour_summary: formData.tour_summary,
         tour_image: formData.tour_image[0],
         inclusions: formData.inclusions.split('\n'),
@@ -309,6 +334,43 @@ const AllTours = () => {
                   onChange={handleInputChange}
                   className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Expiry Date</label>
+                <input
+                  type="date"
+                  name="expiry_date"
+                  value={formData.expiry_date}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Markets</label>
+                <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
+                  {Object.entries(marketMapping).map(([key, value]) => (
+                    <div key={key} className="flex items-center space-x-4">
+                      <input
+                        type="checkbox"
+                        name="markets"
+                        value={key}
+                        checked={formData.markets.includes(Number(key))}
+                        onChange={(e) => {
+                          const { checked, value } = e.target;
+                          setFormData((prevData) => ({
+                            ...prevData,
+                            markets: checked
+                              ? [...prevData.markets, value]
+                              : prevData.markets.filter((market) => market !== value),
+                          }));
+                        }}
+                      />
+                      <label>{value}</label>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div>

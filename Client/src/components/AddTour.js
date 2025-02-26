@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { FaTrash } from "react-icons/fa";
+const marketMapping = {
+  1: 'Indian Market',
+  2: 'Chinese Market',
+  3: 'Asian Markets',
+  4: 'Middle East Markets',
+  5: 'Russia and CIS Markets',
+  6: 'All Markets'
+};
 
 const TourForm = () => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
     nights: "",
+    expiry_date: "",
+    markets: [],
     itinerary: {}, // Stores activities for each day
     itineraryImages: {}, // Stores images for each day
     itineraryTitles: {}, // Stores titles for each day
@@ -209,6 +219,8 @@ const TourForm = () => {
       title: "",
       price: "",
       nights: "",
+      expiry_date: "",
+      markets: [],
       itinerary: {},
       itineraryImages: {},
       itineraryTitles: {},
@@ -235,6 +247,8 @@ const TourForm = () => {
         title: formData.title,
         price: formData.price,
         nights: formData.nights,
+        expiry_date: formData.expiry_date,
+        markets: formData.markets,
         tour_summary: formData.tour_summary,
         tour_image: formData.tour_image[0], // Assuming single image URL
         inclusions: formData.inclusions.split('\n'),
@@ -298,6 +312,46 @@ const TourForm = () => {
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
           />
           {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
+        </div>
+
+        <div>
+          <label className="block text-lg font-medium">Expiry Date</label>
+          <input
+            type="date"
+            name="expiry_date"
+            value={formData.expiry_date}
+            onChange={handleInputChange}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+          />
+          {errors.expiry_date && <p className="text-red-500 text-sm">{errors.expiry_date}</p>}
+        </div>
+
+        {/* Markets */}
+        <div>
+          <label className="block text-lg font-medium">Markets</label>
+          <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
+            {Object.entries(marketMapping).map(([key, value]) => (
+              <div key={key} className="flex items-center space-x-4">
+                <input
+                  type="checkbox"
+                  name="markets"
+                  value={key}
+                  checked={formData.markets.includes(Number(key))}
+                  onChange={(e) => {
+                    const { checked, value } = e.target;
+                    const numericValue = Number(value);
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      markets: checked
+                        ? [...prevData.markets, numericValue]
+                        : prevData.markets.filter((market) => market !== numericValue),
+                    }));
+                  }}
+                />
+                <label>{value}</label>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Tour Summary */}
