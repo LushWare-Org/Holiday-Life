@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { FaTrash } from "react-icons/fa";
 const marketMapping = {
-  1: 'Indian Market',
-  2: 'Chinese Market',
-  3: 'Asian Markets',
-  4: 'Middle East Markets',
-  5: 'Russia and CIS Markets',
-  6: 'All Markets'
+  1: 'Indian',
+  2: 'Chinese',
+  3: 'Asian',
+  4: 'Middle East',
+  5: 'Russia and CIS',
+  6: 'All'
 };
 
 const TourForm = () => {

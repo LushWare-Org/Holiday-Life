@@ -207,12 +207,12 @@ const ImageGallery = ( {searchQuery = ''}) => {
   }, [searchTerm, nights, days, country, market]);
 
   const marketMapping = {
-    1: 'Indian Market',
-    2: 'Chinese Market',
-    3: 'Asian Markets',
-    4: 'Middle East Markets',
-    5: 'Russia and CIS Markets',
-    6: 'All Markets'
+    1: 'Indian',
+    2: 'Chinese',
+    3: 'Asian',
+    4: 'Middle East',
+    5: 'Russia and CIS',
+    6: 'All',
   };
   
   // Also create the inverse for easy lookup
@@ -381,7 +381,7 @@ const ImageGallery = ( {searchQuery = ''}) => {
         />
         <TextField
           fullWidth
-          label="Country"
+          label="Country of Travel"
           variant="outlined"
           value={searchCountry}
           onChange={(e) => setSearchCountry(e.target.value)}
@@ -389,7 +389,7 @@ const ImageGallery = ( {searchQuery = ''}) => {
         <Autocomplete
           options={Object.values(marketMapping)}
           renderInput={(params) => (
-            <TextField {...params} label="Market" variant="outlined" />
+            <TextField {...params} label="Your Region" variant="outlined" />
           )}
           value={marketMapping[searchMarket] || ''}
           onChange={(event, newValue) => {
