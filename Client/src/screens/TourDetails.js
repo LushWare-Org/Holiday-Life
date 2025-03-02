@@ -311,11 +311,11 @@ const TourDetails = () => {
             </Box>  
           )}
           { !isMobile && (
-            <Box className="inline-block bg-blue-700 py-3 px-5 mb-8 shadow-xl">
-              <Typography className="text-white text-6xl font-[Playfair Display]">
-                Expire on {new Date(tour.expiry_date).toISOString().split("T")[0]}
-              </Typography>
-            </Box>
+            <Box className="inline-block bg-gray py-3 px-5 mb-8 shadow-xl ml-2 border-red-500 border-2">
+            <Typography className="text-blue-950 text-6xl font-[Playfair Display]">
+              Expire on {new Date(tour.expiry_date).toISOString().split("T")[0]}
+            </Typography>
+          </Box>
           )}
 
           <Button

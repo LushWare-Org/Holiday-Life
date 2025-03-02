@@ -266,7 +266,16 @@ const Footer = () => {
             rel="noopener noreferrer" 
             style={{ color: '#fff', textDecoration: 'none', marginLeft: '5px' }}
           >
-            Lush Web
+            Lush Web Designers 
+          </a>
+          by
+          <a 
+            href="https://www.lushware.org" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            style={{ color: '#fff', textDecoration: 'none', marginLeft: '5px' }}
+          >
+            Lushware Org
           </a>
         </Typography>
       </Box>
