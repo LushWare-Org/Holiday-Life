@@ -13,7 +13,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: "http://lushtravels.site", // Your frontend
+  origin: ["https://holidaylife.travel", "https://www.holidaylife.travel"], // Your frontend
   methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
 }));
