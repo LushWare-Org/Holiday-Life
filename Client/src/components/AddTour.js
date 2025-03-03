@@ -16,14 +16,19 @@ const TourForm = () => {
     price: "",
     nights: "",
     expiry_date: "",
+    country: "",
     markets: [],
     itinerary: {}, // Stores activities for each day
     itineraryImages: {}, // Stores images for each day
     itineraryTitles: {}, // Stores titles for each day
     tour_image: [],
+    destination_images: [],
+    activity_images: [],
+    hotel_images: [],
     inclusions: "",
     exclusions: "",
     tour_summary: "",
+    oldPrice: "",
   });
 
   const [showItinerary, setShowItinerary] = useState(false);
@@ -220,14 +225,19 @@ const TourForm = () => {
       price: "",
       nights: "",
       expiry_date: "",
+      country: "",
       markets: [],
       itinerary: {},
       itineraryImages: {},
       itineraryTitles: {},
       tour_image: [],
+      destination_images: [],
+      activity_images: [],
+      hotel_images: [],
       inclusions: "",
       exclusions: "",
       tour_summary: "",
+      oldPrice: "",
     });
     setShowItinerary(false);
     setShowRestItinerary(false);
@@ -248,14 +258,19 @@ const TourForm = () => {
         price: formData.price,
         nights: formData.nights,
         expiry_date: formData.expiry_date,
+        country: formData.country,
         markets: formData.markets,
         tour_summary: formData.tour_summary,
-        tour_image: formData.tour_image[0], // Assuming single image URL
+        tour_image: formData.tour_image[0], 
+        destination_images: formData.destination_images,
+        activity_images: formData.activity_images,
+        hotel_images: formData.hotel_images,
         inclusions: formData.inclusions.split('\n'),
         exclusions: formData.exclusions.split('\n'),
         itinerary: formData.itinerary,
         itinerary_images: formData.itineraryImages,
         itinerary_titles: formData.itineraryTitles,
+        oldPrice: formData.oldPrice,
       };
 
       const response = await fetch("/tours", {
@@ -354,6 +369,18 @@ const TourForm = () => {
           </div>
         </div>
 
+        <div>
+          <label className="block text-lg font-medium">Country</label>
+          <textarea
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+            placeholder="Country"
+          />
+          {errors.country && <p className="text-red-500 text-sm">{errors.country}</p>}
+        </div>
+
         {/* Tour Summary */}
         <div>
           <label className="block text-lg font-medium">Tour Summary</label>
@@ -369,7 +396,7 @@ const TourForm = () => {
 
         {/* Tour Image Section */}
         <div>
-          <label className="block text-lg font-medium">Tour Images</label>
+          <label className="block text-lg font-medium">Tour Image</label>
           <input
             type="file"
             multiple
@@ -387,6 +414,93 @@ const TourForm = () => {
                 <button
                   type="button"
                   onClick={() => handleRemoveImage("tour_image", index)}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Destination Images */}
+        <div>
+          <label className="block text-lg font-medium">Destination Images</label>
+          <input
+            type="file"
+            multiple
+            onChange={(e) => handleImageUpload(e, "destination_images")}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+          />
+          <div className="flex space-x-2 mt-4">
+            {formData.destination_images.map((image, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={image}
+                  alt={`Destination Image ${index}`}
+                  className="w-48 h-48 object-cover rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage("destination_images", index)}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Activity Images */}
+        <div>
+          <label className="block text-lg font-medium">Activity Images</label>
+          <input
+            type="file"
+            multiple
+            onChange={(e) => handleImageUpload(e, "activity_images")}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+          />
+          <div className="flex space-x-2 mt-4">
+            {formData.activity_images.map((image, index) => (
+              <div key={index} className="relative">
+                <img
+                 src={image}
+                  alt={`Activity Image ${index}`}
+                  className="w-48 h-48 object-cover rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage("activity_images", index)}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            ))}
+          </div>  
+        </div>
+
+        {/* Hotel Images */}
+        <div>
+          <label className="block text-lg font-medium">Hotel Images</label>
+          <input
+            type="file"
+            multiple
+            onChange={(e) => handleImageUpload(e, "hotel_images")}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+          />
+          <div className="flex space-x-2 mt-4">
+            {formData.hotel_images.map((image, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={image}
+                  alt={`Hotel Image ${index}`}
+                  className="w-48 h-48 object-cover rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage("hotel_images", index)}
                   className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                 >
                   <FaTrash />
@@ -546,6 +660,19 @@ const TourForm = () => {
             placeholder="List of exclusions and use ENTER key for each activity"
           />
         </div>
+
+        {/* Old Price */}
+        <div>
+          <label className="block text-lg font-medium">Old Price (Optional)</label>
+          <input
+            type="text"
+            name="oldPrice"
+            value={formData.oldPrice}
+            onChange={handleInputChange}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+          />
+        </div>
+
 
         {/* Submit Tour Button */}
         <div className="flex justify-center mt-5">

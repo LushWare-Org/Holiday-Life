@@ -11,14 +11,19 @@ const AllTours = () => {
     price: "",
     nights: "",
     expiry_date: "",
+    country: "",
     markets: [],
     itinerary: {},
     itineraryImages: {},
     itineraryTitles: {},
     tour_image: [],
+    destination_images: [],
+    activity_images: [],
+    hotel_images: [],
     inclusions: "",
     exclusions: "",
     tour_summary: "",
+    oldPrice: "",
   });
 
   useEffect(() => {
@@ -49,14 +54,19 @@ const AllTours = () => {
       price: tour.price,
       nights: tour.nights,
       expiry_date: formatDate(tour.expiry_date),
+      country: tour.country,
       markets: tour.markets || [] ,
       itinerary: tour.itinerary || {},
       itineraryImages: tour.itinerary_images || {},
       itineraryTitles: tour.itinerary_titles || {},
       tour_image: Array.isArray(tour.tour_image) ? tour.tour_image : [tour.tour_image],
+      destination_images: tour.destination_images || [],
+      activity_images: tour.activity_images || [],
+      hotel_images: tour.hotel_images || [],
       inclusions: tour.inclusions.join("\n"),
       exclusions: tour.exclusions.join("\n"),
       tour_summary: tour.tour_summary,
+      oldPrice: tour.oldPrice || "",
     });
   };
 
@@ -67,14 +77,19 @@ const AllTours = () => {
       price: "",
       nights: "",
       expiry_date: "",
+      country: "",
       markets: [],
       itinerary: {},
       itineraryImages: {},
       itineraryTitles: {},
       tour_image: [],
+      destination_images: [],
+      activity_images: [],
+      hotel_images: [],
       inclusions: "",
       exclusions: "",
       tour_summary: "",
+      oldPrice: "",
     });
   };
 
@@ -209,14 +224,19 @@ const AllTours = () => {
         price: formData.price,
         nights: formData.nights,
         expiry_date: formData.expiry_date,
-        markets: formData.markets,
+        country: formData.country,
+        markets: formData.markets,  
         tour_summary: formData.tour_summary,
         tour_image: formData.tour_image[0],
+        destination_images: formData.destination_images,
+        activity_images: formData.activity_images,
+        hotel_images: formData.hotel_images,
         inclusions: formData.inclusions.split('\n'),
         exclusions: formData.exclusions.split('\n'),
         itinerary: formData.itinerary,
         itinerary_images: formData.itineraryImages,
         itinerary_titles: formData.itineraryTitles,
+        oldPrice: formData.oldPrice,
       };
 
       const response = await axios.put(`/tours/${editTour._id}`, payload);
@@ -348,6 +368,17 @@ const AllTours = () => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Country</label>
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-600 mb-0">Markets</label>
                 <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
                   {Object.entries(marketMapping).map(([key, value]) => (
@@ -385,7 +416,7 @@ const AllTours = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-0">Tour Images</label>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Tour Image</label>
                 <input
                   type="file"
                   multiple
@@ -403,6 +434,90 @@ const AllTours = () => {
                       <button
                         type="button"
                         onClick={() => handleRemoveImage("tour_image", index)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Destination Images</label>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => handleImageUpload(e, "destination_images")}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+                <div className="flex space-x-2 mt-4">
+                  {formData.destination_images.map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={image}
+                        alt={`Destination Image ${index}`}
+                        className="w-24 h-24 object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage("destination_images", index)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Activity Images</label>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => handleImageUpload(e, "activity_images")}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+                <div className="flex space-x-2 mt-4">
+                  {formData.activity_images.map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={image}
+                        alt={`Activity Image ${index}`}
+                        className="w-24 h-24 object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage("activity_images", index)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+                  
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Hotel Images</label>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => handleImageUpload(e, "hotel_images")}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+                <div className="flex space-x-2 mt-4">
+                  {formData.hotel_images.map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={image}
+                        alt={`Hotel Image ${index}`}
+                        className="w-24 h-24 object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage("hotel_images", index)}
                         className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                       >
                         <FaTrash />
@@ -507,6 +622,17 @@ const AllTours = () => {
                   onChange={handleInputChange}
                   className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                   placeholder="List of exclusions and use ENTER key for each activity"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Old Price</label>
+                <input
+                  type="text"
+                  name="oldPrice"
+                  value={formData.oldPrice}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                 />
               </div>
 
