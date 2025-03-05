@@ -273,6 +273,8 @@ const TourForm = () => {
         oldPrice: formData.oldPrice,
       };
 
+      console.log("Payload:", JSON.stringify(payload));
+
       const response = await fetch("/tours", {
         method: "POST",
         headers: {
