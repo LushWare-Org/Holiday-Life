@@ -283,12 +283,11 @@ const TourForm = () => {
 
         console.log("Payload:", JSON.stringify(payload));
 
-        const response = await fetch("/tours", {
-          method: "POST",
+        const response = await axios.post("/tours", payload, {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload),
+          withCredentials: true,
         });
 
         const contentType = response.headers.get("content-type");

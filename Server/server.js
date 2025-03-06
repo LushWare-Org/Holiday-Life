@@ -13,11 +13,12 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: ["https://holidaylife.travel", "https://www.holidaylife.travel"], // Your frontend
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-  credentials: true, 
+  origin: ["https://holidaylife.travel", "https://www.holidaylife.travel"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],  // Add "OPTIONS" here
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 }));
+
 
 app.use(express.json());
 
