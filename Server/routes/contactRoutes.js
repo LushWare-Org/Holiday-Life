@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
   host: 'mail.holidaylife.travel',
-  port: '587',
+  port: 587,
   secure: false, 
   auth: {
     user: 'sales@holidaylife.travel',
