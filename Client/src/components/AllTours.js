@@ -390,11 +390,12 @@ const AllTours = () => {
                         checked={formData.markets.includes(Number(key))}
                         onChange={(e) => {
                           const { checked, value } = e.target;
+                          const numericValue = Number(value); // Convert string to number
                           setFormData((prevData) => ({
                             ...prevData,
                             markets: checked
-                              ? [...prevData.markets, value]
-                              : prevData.markets.filter((market) => market !== value),
+                              ? [...prevData.markets, numericValue]
+                              : prevData.markets.filter((market) => market !== numericValue),
                           }));
                         }}
                       />
