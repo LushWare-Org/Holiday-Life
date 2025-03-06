@@ -6,12 +6,12 @@ require('dotenv').config();
 
 // Configure Nodemailer transporter using .env variables
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_PORT == '465', // true if port is 465
+  host: 'mail.holidaylife.travel',
+  port: '465',
+  secure: true, 
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: 'sales@holidaylife.travel',
+    pass: 'Sales@holi_997',
   },
 });
 
@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 const sendInquiryEmail = async ({ name, email, phone_number, travel_date, traveller_count, message }) => {
   const mailOptions = {
     from: `"${name}" <${email}>`, // "John Doe" <john@gmail.com>
-    to: process.env.SMTP_USER,    // admin email from your .env or another email
+    to: 'sales@holidaylife.travel',    // admin email from your .env or another email
     subject: `New Inquiry from ${name}`,
     html: `
       <h2>New Travel Inquiry</h2>

@@ -4,42 +4,33 @@ const ContactSubmission = require('../models/ContactSubmission');
 const router = express.Router();
 require('dotenv').config(); 
 
-// Configure Nodemailer with SMTP settings
-// const transporter = nodemailer.createTransport({
-//   host: process.env.SMTP_HOST,
-//   port: process.env.SMTP_PORT,
-//   secure: process.env.SMTP_PORT == '465', 
-//   auth: {
-//     user: process.env.SMTP_USER,
-//     pass: process.env.SMTP_PASS,
-//   },
-// });
-
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: '587',
-  secure: false, 
+  host: 'mail.holidaylife.travel',
+  port: '465',
+  secure: true, 
   auth: {
-    user: 'shaliniavindya@gmail.com',
-    pass: 'fsgqdngupkyncsch',
+    user: 'sales@holidaylife.travel',
+    pass: 'Sales@holi_997',
   },
 });
 
-// Send Contact Email
-const sendContactEmail = async ({ name, email, message }) => {
+// Helper function to send inquiry email to Admin
+const sendInquiryEmail = async ({ name, email, phone_number, travel_date, traveller_count, message }) => {
   const mailOptions = {
-    from: 'shaliniavindya@gmail.com',
-    to: email, 
-    subject: `New Contact Inquiry from ${name}`,
-    text: message, 
-    html: `
-      <p>You have a new contact inquiry:</p>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Message:</strong></p>
-      <p>${message}</p>
-    `,
-  };
+  from: `"${name}" <${email}>`, // "John Doe" <john@gmail.com>
+  to: 'sales@holidaylife.travel',    // admin email from your .env or another email
+  subject: `New Inquiry from ${name}`,
+  html: `
+    <h2>New Travel Inquiry</h2>
+    <p><strong>Name:</strong> ${name}</p>
+    <p><strong>Email:</strong> ${email}</p>
+    <p><strong>Phone:</strong> ${phone_number}</p>
+    <p><strong>Travel Date:</strong> ${travel_date}</p>
+    <p><strong>Traveller Count:</strong> ${traveller_count}</p>
+    <p><strong>Message:</strong></p>
+    <p>${message}</p>
+  `,
+};
 
   return transporter.sendMail(mailOptions); 
 };
