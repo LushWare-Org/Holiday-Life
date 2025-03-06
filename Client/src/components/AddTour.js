@@ -292,15 +292,6 @@ const TourForm = () => {
           withCredentials: true,
         });
 
-        const contentType = response.headers.get("content-type");
-        if (!response.ok) {
-          throw new Error(`Server Error: ${response.status} - ${response.statusText}`);
-        }
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Invalid JSON response from server.");
-        }
-
-        const data = await response.json();
         Swal.fire("Success!", "Tour has been created successfully.", "success");
         handleResetItinerary();
       } catch (error) {
