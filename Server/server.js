@@ -16,6 +16,7 @@ app.use(cors({
   origin: ["https://holidaylife.travel", "https://www.holidaylife.travel"], // Your frontend
   methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  credentials: true, 
 }));
 
 app.use(express.json());
@@ -29,9 +30,6 @@ app.use(session({
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.options("*", cors());
-
 
 app.use('/tours', tourRoutes);
 app.use('/inquiries', inquireRoutes);
