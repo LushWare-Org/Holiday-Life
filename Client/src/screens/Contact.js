@@ -40,8 +40,8 @@ const ContactUsForm = () => {
         formData
     );
 
-      if (response.success) {
-        setStatus({ type: "success", message: response.message });
+      if (response.data.success) {
+        setStatus({ type: "success", message: response.data.message });
         setFormData({ name: "", email: "", message: "" });
       } else {
         setStatus({ type: "error", message: response.message });

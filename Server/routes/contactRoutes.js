@@ -18,8 +18,8 @@ const transporter = nodemailer.createTransport({
 // Send Contact Email
 const sendContactEmail = async ({ name, email, message }) => {
   const mailOptions = {
-    from: `"${name}" <${email}>`, 
-    to: process.env.SMTP_USER, 
+    from: process.env.SMTP_USER,
+    to: email, 
     subject: `New Contact Inquiry from ${name}`,
     text: message, 
     html: `
@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
     res.status(200).json({ success: true, message: 'Thank you for contacting us! We have received your message.' });
   } catch (error) {
     console.error('Error processing contact form:', error);
-    res.status(500).json({ success:false, message: 'Error: Unable to submit your message.' });
+    res.status(500).json({ success:false, message: 'Error: Unable to submit your message.', error: error });
   }
 });
 

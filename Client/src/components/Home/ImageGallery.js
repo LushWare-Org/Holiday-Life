@@ -134,14 +134,18 @@ const ImageGallery = ( {searchQuery = ''}) => {
   const days = query.get('days') || '';
   const country = query.get('country') || '';
   const market = query.get('market') || '';
+  const minPrice = query.get('minPrice') || '';
+  const maxPrice = query.get('maxPrice') || '';
   const selectedCurrency = localStorage.getItem('selectedCurrency') || 'USD';
   const [search, setSearch] = useState(searchTerm);
   const [searchNights, setSearchNights] = useState(nights);
   const [searchDays, setSearchDays] = useState(days);
   const [searchCountry, setSearchCountry] = useState(country);
+  
   const [searchMarket, setSearchMarket] = useState('');
   const [exchangeRates, setExchangeRates] = useState({});
-
+  const [searchMinPrice, setSearchMinPrice] = useState(minPrice);
+  const [searchMaxPrice, setSearchMaxPrice] = useState(maxPrice);
   const { isMobile, isTablet} = useDeviceType();
 
   const currency = useCurrency();
@@ -204,7 +208,9 @@ const ImageGallery = ( {searchQuery = ''}) => {
     setSearchDays(days);
     setSearchCountry(country);
     setSearchMarket(market);
-  }, [searchTerm, nights, days, country, market]);
+    setSearchMinPrice(minPrice);
+    setSearchMaxPrice(maxPrice);
+  }, [searchTerm, nights, days, country, market, minPrice, maxPrice]);
 
   const marketMapping = {
     1: 'Indian',
@@ -219,6 +225,11 @@ const ImageGallery = ( {searchQuery = ''}) => {
   const marketMappingInverse = Object.fromEntries(
     Object.entries(marketMapping).map(([key, value]) => [value, Number(key)])
   );
+
+  const localToUSD = (localPrice) => {
+    if (!exchangeRates[currency]) return localPrice; 
+    return localPrice / exchangeRates[currency];
+  };
 
   const filteredTours = tours.filter((tour) => {
     const searchDaysValue = searchDays ? parseInt(searchDays) : null;
@@ -235,14 +246,22 @@ const ImageGallery = ( {searchQuery = ''}) => {
       Number(searchMarket) === 6 ||
       (Array.isArray(tour.markets) && tour.markets.includes(Number(searchMarket)));
     
-  
-    return (
-      (!search || tour.title.toLowerCase().includes(search.toLowerCase())) &&
-      (!searchNightsValue || tour.nights === searchNightsValue) &&
-      (!searchDaysValue || tour.nights +1 === searchDaysValue) &&
-      (!searchCountry || tour.country.toLowerCase().includes(searchCountry.toLowerCase())) &&
-      marketMatch
-    );
+    const minValUSD = searchMinPrice
+      ? localToUSD(parseFloat(searchMinPrice))
+      : null;
+    const maxValUSD = searchMaxPrice
+        ? localToUSD(parseFloat(searchMaxPrice))
+        : null;
+
+      return (
+        (!search || tour.title.toLowerCase().includes(search.toLowerCase())) &&
+        (!searchNightsValue || tour.nights === searchNightsValue) &&
+        (!searchDaysValue || tour.nights + 1 === searchDaysValue) &&
+        (!minValUSD || tour.price >= minValUSD) &&
+        (!maxValUSD || tour.price <= maxValUSD) &&
+        (!searchCountry || tour.country.toLowerCase().includes(searchCountry.toLowerCase())) &&
+        marketMatch
+      );
     });
 
   
@@ -254,6 +273,8 @@ const ImageGallery = ( {searchQuery = ''}) => {
       days: searchDays,
       country: searchCountry,
       markets: searchMarket,
+      minPrice: searchMinPrice,
+      maxPrice: searchMaxPrice,
     }).toString();
     navigate(`/imagegallery?${query}`);
   };
@@ -269,6 +290,7 @@ const ImageGallery = ( {searchQuery = ''}) => {
     setName('');
     setEmail('');
     setPhoneNumber('');
+    setPhoneNumber1('');
     setTravelDate('');
     setTravellerCount('');
     setMessage('');
@@ -351,7 +373,7 @@ const ImageGallery = ( {searchQuery = ''}) => {
         onSubmit={handleSearchSubmit}
         sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' }, // Column layout for mobile, row for larger screens
+          flexDirection: isMobile ? 'column' : 'row',
           gap: '10px',
           backgroundColor: '#dfedf7',
           padding: '10px 20px',
@@ -379,6 +401,21 @@ const ImageGallery = ( {searchQuery = ''}) => {
           value={searchDays}
           onChange={(e) => setSearchDays(e.target.value)}
         />
+        <TextField
+          fullWidth
+          label="Min Price"
+          variant="outlined"
+          value={searchMinPrice}
+          onChange={(e) => setSearchMinPrice(e.target.value)}
+        />
+        <TextField
+          fullWidth
+          label="Max Price"
+          variant="outlined"
+          value={searchMaxPrice}
+          onChange={(e) => setSearchMaxPrice(e.target.value)}
+        />
+
         <TextField
           fullWidth
           label="Country of Travel"

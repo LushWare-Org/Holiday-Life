@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, message, Space, Card, Divider } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 /**
  * Custom hook to detect device type (mobile, tablet, desktop).
@@ -51,15 +52,15 @@ const TourInquiries = () => {
   const fetchInquiries = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/inquiries');
-      if (!response.ok) throw new Error('Failed to fetch inquiries.');
-      const data = await response.json();
+      const response = await axios.get('/inquiries');
+      if (response.status !== 200) throw new Error('Failed to fetch inquiries.');
+      const data = response.data;
 
       // Transform data if needed (handle _id and travel_date)
       const transformed = data.map((item) => ({
-        ...item,
-        _id: item._id?.$oid || item._id,
-        travel_date: item.travel_date ? new Date(item.travel_date) : null,
+      ...item,
+      _id: item._id?.$oid || item._id,
+      travel_date: item.travel_date ? new Date(item.travel_date) : null,
       }));
 
       setInquiries(transformed);
@@ -77,8 +78,8 @@ const TourInquiries = () => {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`/inquiries/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete inquiry.');
+      const response = await axios.delete(`/inquiries/${id}`);
+      if (response.status !== 200) throw new Error('Failed to delete inquiry.');
       message.success('Inquiry deleted successfully.');
       fetchInquiries();
     } catch (error) {
@@ -95,18 +96,14 @@ const TourInquiries = () => {
     }
 
     try {
-      const response = await fetch('/inquiries/reply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          inquiryId: currentInquiry._id,
-          email: currentInquiry.email,
-          subject: subject || `Reply to: ${currentInquiry.name}`,
-          replyMessage,
-        }),
+      const response = await axios.post('/inquiries/reply', {
+      inquiryId: currentInquiry._id,
+      email: currentInquiry.email,
+      subject: subject || `Reply to: ${currentInquiry.name}`,
+      replyMessage,
       });
 
-      if (!response.ok) throw new Error('Failed to send reply.');
+      if (response.status !== 200) throw new Error('Failed to send reply.');
       message.success('Reply sent successfully.');
       setReplyModalVisible(false);
       setReplyMessage('');

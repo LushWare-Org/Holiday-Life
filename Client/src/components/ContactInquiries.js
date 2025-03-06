@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, message, Space, Card, Divider } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 function useDeviceType() {
   const [deviceType, setDeviceType] = useState({
@@ -43,10 +44,8 @@ const ContactInquiries = () => {
   const fetchInquiries = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/contact/inquiries');
-      if (!response.ok) throw new Error('Failed to fetch inquiries.');
-      const data = await response.json();
-      setInquiries(data);
+      const response = await axios.get('/contact/inquiries');
+      setInquiries(response.data);
     } catch (error) {
       console.error('Error fetching inquiries:', error);
       message.error(error.message || 'Failed to fetch inquiries.');
@@ -60,8 +59,7 @@ const ContactInquiries = () => {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`/contact/inquiries/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete inquiry.');
+      const response = await axios.delete(`/contact/inquiries/${id}`);
       message.success('Inquiry deleted successfully.');
       fetchInquiries();
     } catch (error) {
@@ -78,18 +76,13 @@ const ContactInquiries = () => {
     }
 
     try {
-      const response = await fetch('/contact/reply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          inquiryId: currentInquiry._id,
-          email: currentInquiry.email,
-          subject: subject || `Reply to: ${currentInquiry.name}`,
-          replyMessage,
-        }),
+      const response = await axios.post('/contact/reply', {
+      inquiryId: currentInquiry._id,
+      email: currentInquiry.email,
+      subject: subject || `Reply to: ${currentInquiry.name}`,
+      replyMessage,
       });
 
-      if (!response.ok) throw new Error('Failed to send reply.');
       message.success('Reply sent successfully.');
       setReplyModalVisible(false);
       setReplyMessage('');
