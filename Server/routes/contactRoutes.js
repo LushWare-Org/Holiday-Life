@@ -5,20 +5,30 @@ const router = express.Router();
 require('dotenv').config(); 
 
 // Configure Nodemailer with SMTP settings
+// const transporter = nodemailer.createTransport({
+//   host: process.env.SMTP_HOST,
+//   port: process.env.SMTP_PORT,
+//   secure: process.env.SMTP_PORT == '465', 
+//   auth: {
+//     user: process.env.SMTP_USER,
+//     pass: process.env.SMTP_PASS,
+//   },
+// });
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_PORT == '465', 
+  host: 'smtp.gmail.com',
+  port: '587',
+  secure: false, 
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: 'shaliniavindya@gmail.com',
+    pass: 'fsgqdngupkyncsch',
   },
 });
 
 // Send Contact Email
 const sendContactEmail = async ({ name, email, message }) => {
   const mailOptions = {
-    from: process.env.SMTP_USER,
+    from: 'shaliniavindya@gmail.com',
     to: email, 
     subject: `New Contact Inquiry from ${name}`,
     text: message, 
@@ -46,7 +56,7 @@ router.post('/', async (req, res) => {
     await newSubmission.save();
 
     // Send email notification
-    // await sendContactEmail({ name, email, message });
+    await sendContactEmail({ name, email, message });
 
     res.status(200).json({ success: true, message: 'Thank you for contacting us! We have received your message.' });
   } catch (error) {
