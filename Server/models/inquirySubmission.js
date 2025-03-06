@@ -9,8 +9,6 @@ const inquirySchema = new Schema(
     travel_date: { type: Date, required: true },
     traveller_count: { type: Number, required: true },
     message: { type: String, default: '' },
-
-    // Optional: If you want to link to a Tour document, store the ID here:
     tour_id: { type: Schema.Types.ObjectId, ref: 'Tour', default: null },
   },
   { timestamps: true }

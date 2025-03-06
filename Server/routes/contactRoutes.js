@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
     await newSubmission.save();
 
     // Send email notification
-    await sendContactEmail({ name, email, message });
+    // await sendContactEmail({ name, email, message });
 
     res.status(200).json({ success: true, message: 'Thank you for contacting us! We have received your message.' });
   } catch (error) {
