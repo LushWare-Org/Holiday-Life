@@ -15,22 +15,20 @@ const transporter = nodemailer.createTransport({
 });
 
 // Helper function to send inquiry email to Admin
-const sendInquiryEmail = async ({ name, email, phone_number, travel_date, traveller_count, message }) => {
+const sendContactEmail = async ({ name, email, message }) => {
   const mailOptions = {
-  from: `"${name}" <${email}>`, // "John Doe" <john@gmail.com>
-  to: 'sales@holidaylife.travel',    // admin email from your .env or another email
-  subject: `New Inquiry from ${name}`,
-  html: `
-    <h2>New Travel Inquiry</h2>
-    <p><strong>Name:</strong> ${name}</p>
-    <p><strong>Email:</strong> ${email}</p>
-    <p><strong>Phone:</strong> ${phone_number}</p>
-    <p><strong>Travel Date:</strong> ${travel_date}</p>
-    <p><strong>Traveller Count:</strong> ${traveller_count}</p>
-    <p><strong>Message:</strong></p>
-    <p>${message}</p>
-  `,
-};
+    from: 'sales@holidaylife.travel',
+    to: email, 
+    subject: `New Contact Inquiry from ${name}`,
+    text: message, 
+    html: `
+      <p>You have a new contact inquiry:</p>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `,
+  };
 
   return transporter.sendMail(mailOptions); 
 };
