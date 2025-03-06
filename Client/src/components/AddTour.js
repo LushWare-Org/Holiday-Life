@@ -18,7 +18,7 @@ const TourForm = () => {
     expiry_date: "",
     country: "",
     markets: [],
-    itinerary: {}, // Stores activities for each day
+    itinerary: {}, // Stores activities for each day as a string (later split into an array)
     itineraryImages: {}, // Stores images for each day
     itineraryTitles: {}, // Stores titles for each day
     tour_image: [],
@@ -89,8 +89,8 @@ const TourForm = () => {
     const uploadedUrls = [];
   
     for (const file of files) {
-      const formData = new FormData();
-      formData.append('image', file);
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', file);
   
       try {
         // Display loading indicator
@@ -112,7 +112,7 @@ const TourForm = () => {
   
         const response = await fetch(`https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39`, {
           method: 'POST',
-          body: formData,
+          body: uploadFormData,
         });
   
         if (!response.ok) {
@@ -250,58 +250,66 @@ const TourForm = () => {
   };
 
   const handleSubmitTour = async () => {
-  const isValid = validateForm();
-  if (isValid) {
-    try {
-      const payload = {
-        title: formData.title,
-        price: formData.price,
-        nights: formData.nights,
-        expiry_date: formData.expiry_date,
-        country: formData.country,
-        markets: formData.markets,
-        tour_summary: formData.tour_summary,
-        tour_image: formData.tour_image[0], 
-        destination_images: formData.destination_images,
-        activity_images: formData.activity_images,
-        hotel_images: formData.hotel_images,
-        inclusions: formData.inclusions.split('\n'),
-        exclusions: formData.exclusions.split('\n'),
-        itinerary: formData.itinerary,
-        itinerary_images: formData.itineraryImages,
-        itinerary_titles: formData.itineraryTitles,
-        oldPrice: formData.oldPrice,
-      };
+    const isValid = validateForm();
+    if (isValid) {
+      try {
+        // Transform itinerary: split each day's activities into an array of strings
+        const itineraryTransformed = Object.fromEntries(
+          Object.entries(formData.itinerary).map(([day, activities]) => [
+            day,
+            activities.split('\n').filter(activity => activity.trim() !== '')
+          ])
+        );
 
-      console.log("Payload:", JSON.stringify(payload));
+        const payload = {
+          title: formData.title,
+          price: Number(formData.price),
+          nights: Number(formData.nights),
+          expiry_date: formData.expiry_date,
+          country: formData.country,
+          markets: formData.markets,
+          tour_summary: formData.tour_summary,
+          tour_image: formData.tour_image[0],
+          destination_images: formData.destination_images,
+          activity_images: formData.activity_images,
+          hotel_images: formData.hotel_images,
+          inclusions: formData.inclusions.split('\n').filter(item => item.trim() !== ''),
+          exclusions: formData.exclusions.split('\n').filter(item => item.trim() !== ''),
+          itinerary: itineraryTransformed,
+          itinerary_images: formData.itineraryImages,
+          itinerary_titles: formData.itineraryTitles,
+          oldPrice: formData.oldPrice,
+        };
 
-      const response = await fetch("/tours", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+        console.log("Payload:", JSON.stringify(payload));
 
-      const contentType = response.headers.get("content-type");
-      if (!response.ok) {
-        throw new Error(`Server Error: ${response.status} - ${response.statusText}`);
+        const response = await fetch("/tours", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const contentType = response.headers.get("content-type");
+        if (!response.ok) {
+          throw new Error(`Server Error: ${response.status} - ${response.statusText}`);
+        }
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Invalid JSON response from server.");
+        }
+
+        const data = await response.json();
+        Swal.fire("Success!", "Tour has been created successfully.", "success");
+        handleResetItinerary();
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire("Error", error.message, "error");
       }
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Invalid JSON response from server.");
-      }
-
-      const data = await response.json();
-      Swal.fire("Success!", "Tour has been created successfully.", "success");
-      handleResetItinerary();
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.fire("Error", error.message, "error");
+    } else {
+      Swal.fire("Error", "Please fill out all required fields.", "error");
     }
-  } else {
-    Swal.fire("Error", "Please fill out all required fields.", "error");
-  }
-};
+  };
 
   return (
     <div className="bg-white min-h-screen p-0">
@@ -470,7 +478,7 @@ const TourForm = () => {
             {formData.activity_images.map((image, index) => (
               <div key={index} className="relative">
                 <img
-                 src={image}
+                  src={image}
                   alt={`Activity Image ${index}`}
                   className="w-48 h-48 object-cover rounded"
                 />
@@ -555,7 +563,7 @@ const TourForm = () => {
 
                   <textarea
                     rows="2"
-                    placeholder={`Activities for ${dayKey} and use ENTER key for each activity`}
+                    placeholder={`Activities for ${dayKey} (use ENTER for each activity)`}
                     value={formData.itinerary[dayKey]}
                     onChange={(e) => handleItineraryChange(e, dayKey)}
                     className="p-2 w-full border border-gray-300 rounded-md"
@@ -650,7 +658,7 @@ const TourForm = () => {
             value={formData.inclusions}
             onChange={handleInputChange}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="List of inclusions and use ENTER key for each activity"
+            placeholder="List of inclusions (one per line)"
           />
         </div>
 
@@ -662,7 +670,7 @@ const TourForm = () => {
             value={formData.exclusions}
             onChange={handleInputChange}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="List of exclusions and use ENTER key for each activity"
+            placeholder="List of exclusions (one per line)"
           />
         </div>
 
@@ -678,12 +686,11 @@ const TourForm = () => {
           />
         </div>
 
-
         {/* Submit Tour Button */}
         <div className="flex justify-center mt-5">
           <button
-            type="button"  // Change type to "button" to prevent form submission
-            onClick={handleSubmitTour} // Call handleSubmitTour when clicked
+            type="button"
+            onClick={handleSubmitTour}
             className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
           >
             Submit Tour
