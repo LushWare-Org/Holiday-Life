@@ -7,8 +7,7 @@ require('dotenv').config();
 const transporter = nodemailer.createTransport({
   host: 'smtp.hostinger.com',
   port: 587,
-secure: false,
- 
+  secure: false,
   auth: {
     user: 'sales@holidaylife.travel',
     pass: 'Sales@holi_997',
@@ -91,7 +90,7 @@ router.post('/reply', async (req, res) => {
   }
 
   const mailOptions = {
-    from: process.env.SMTP_USER,
+    from: 'sales@holidaylife.travel',
     to: email,
     subject,
     text: replyMessage,

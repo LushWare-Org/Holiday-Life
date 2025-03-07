@@ -89,7 +89,7 @@ router.post('/reply', async (req, res) => {
   }
 
   const mailOptions = {
-    from: process.env.SMTP_USER,
+    from: 'sales@holidaylife.travel',
     to: email,
     subject,
     text: replyMessage,
