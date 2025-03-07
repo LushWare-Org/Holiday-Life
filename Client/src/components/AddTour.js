@@ -12,12 +12,21 @@ const marketMapping = {
   6: 'All'
 };
 
+const foodCategoryMapping ={
+  1: 'Half Board',
+  2: 'Full Board',
+  3: 'All Inclusive',
+}
+
 const TourForm = () => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
     nights: "",
     expiry_date: "",
+    valid_from: "",
+    valid_to: "",
+    food_category: "",
     country: "",
     markets: [],
     itinerary: {}, // Stores activities for each day as a string (later split into an array)
@@ -227,6 +236,9 @@ const TourForm = () => {
       price: "",
       nights: "",
       expiry_date: "",
+      valid_from: "",
+      valid_to: "",
+      food_category: "",
       country: "",
       markets: [],
       itinerary: {},
@@ -268,6 +280,9 @@ const TourForm = () => {
           price: Number(formData.price),
           nights: Number(formData.nights),
           expiry_date: formData.expiry_date,
+          valid_from: formData.valid_from,
+          valid_to: formData.valid_to,
+          food_category: formData.food,
           country: formData.country,
           markets: formData.markets,
           tour_summary: formData.tour_summary,
@@ -344,6 +359,55 @@ const TourForm = () => {
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
           />
           {errors.expiry_date && <p className="text-red-500 text-sm">{errors.expiry_date}</p>}
+        </div>
+
+        
+        <div>
+          <label className="block text-lg font-medium">Valid From</label>
+          <input
+            type="date"
+            name="valid_from"
+            value={formData.valid_from}
+            onChange={handleInputChange}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+          />
+          {errors.valid_from && <p className="text-red-500 text-sm">{errors.valid_from}</p>}
+        </div>
+
+        <div>
+          <label className="block text-lg font-medium">Valid To</label>
+          <input
+            type="date"
+            name="valid_to"
+            value={formData.valid_to}
+            onChange={handleInputChange}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+          />
+          {errors.valid_to && <p className="text-red-500 text-sm">{errors.valid_to}</p>}
+        </div>
+
+        <div>
+          <label className="block text-lg font-medium">Food Category</label>
+          <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
+            {Object.entries(foodCategoryMapping).map(([key, value]) => (
+              <div key={key} className="flex items-center space-x-4">
+                <input
+                  type="radio"
+                  name="food_category"
+                  value={key}
+                  checked={formData.food_category === key}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      food_category: value,
+                    }));
+                  }}
+                />
+                <label>{value}</label>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Markets */}

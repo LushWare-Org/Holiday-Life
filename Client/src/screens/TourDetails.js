@@ -151,6 +151,12 @@ const TourDetails = () => {
 
   const currency = useCurrency();
 
+  const foodCatecoryMap = {
+    1: 'Half Board',
+    2: 'Full Board',
+    3: 'All Inclusive',
+  }
+
   const convertPrice = (priceInUSD) => {
     if (!exchangeRates[currency]) return priceInUSD.toLocaleString();
     return (priceInUSD * exchangeRates[currency]).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -279,70 +285,107 @@ const TourDetails = () => {
                 {tour.nights + 1} Days / {tour.nights} Nights
               </Typography>
             </Box>
-
             <Box sx={{ flexBasis: 'calc(50% - 6px)' }} className="bg-blue-700 py-3 px-1 shadow-xl text-center">
               <Typography className="text-white text-7xl font-[Domine]">
-                Price: {selectedCurrency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}
+              Price: <span style={{ fontWeight: 'bold' }}>{selectedCurrency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}</span>
+              </Typography>
+            </Box>
+
+            <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }} className="bg-blue-700 py-3 px-1 shadow-xl text-center">
+              <Typography className="text-white text-6xl font-[Playfair Display]">
+                Food Category: <span style={{ fontWeight: 'bold' }}>{foodCatecoryMap[tour.food_category]}</span>
               </Typography>
             </Box>
 
             {/* Second Row - third box */}
             <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
-              <Box className="inline-block bg-gray py-3 px-5 mb-8 shadow-xl ml-2 border-red-500 border-2">
-                <Typography className="text-blue-950 text-6xl font-[Playfair Display]">
-                  Expire on {new Date(tour.expiry_date).toISOString().split("T")[0]}
+              <Box className="bg-gray py-3 px-6 shadow-xl w-full text-center">
+                <Typography className="text-blue-900 text-6xl font-[Playfair Display]">
+                  Expire on <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.expiry_date).toISOString().split("T")[0]}</span>
                 </Typography>
               </Box>
             </Box>
-          </Box>
+
+            <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+              <Box className="bg-gray py-3 px-6 shadow-xl w-full text-center">  
+                <Typography className="text-blue-900 text-6xl font-[Playfair Display]">
+                Valid from <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.valid_from).toISOString().split("T")[0]}</span> to <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.valid_to).toISOString().split("T")[0]}</span>
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
+              <Button
+                sx={{
+                  background: 'linear-gradient(to right, #1e3a8a, #4f46e5)', 
+                  color: 'white',
+                  padding: '7px 20px',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  fontFamily: 'Domine',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: '20px',
+                  position: isMobile? 'relative': 'absolute',
+                  right: isMobile ? '0vh' : '8vw',
+                  top: isMobile ? '-2vh' : 'auto',
+                  width: isMobile? '100%': 'auto',
+                  '&:hover': {
+                    background: 'linear-gradient(to right, #1e40af, #3730a3)', 
+                  },
+                }}
+                onClick={handleOpenDialog}
+              >
+                
+                Inquire Now
+                <SendIcon sx={{ marginLeft: '10px', fontSize: 'inherit' }} />
+              </Button>
+            </Box>
+        </Box>
         )}
+
         { !isMobile && (
-            <Box className="inline-block bg-blue-700 py-3 px-5 mb-8 shadow-xl">
+          <Box 
+            sx={{ 
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '20px',
+              justifyContent: 'space-between',
+              marginBottom: '30px'
+            }}
+          >
+            <Box className="bg-blue-700 py-3 px-5 shadow-xl">
               <Typography className="text-white text-6xl font-[Playfair Display]">
                 {tour.nights + 1} Days / {tour.nights} Nights
               </Typography>
             </Box>
-          )}
-          { !isMobile && (
-            <Box className="inline-block bg-blue-700 py-3 px-5 mb-8 shadow-xl ml-2">
+            
+            <Box className="bg-blue-700 py-3 px-5 shadow-xl">
               <Typography className="text-white text-7xl font-[Domine]">
-                Price: {selectedCurrency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}
+                Price: <span style={{ fontWeight: 'bold' }}>{selectedCurrency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}</span>
               </Typography>
             </Box>  
-          )}
-          { !isMobile && (
-            <Box className="inline-block bg-gray py-3 px-5 mb-8 shadow-xl ml-2 border-red-500 border-2">
-            <Typography className="text-blue-950 text-6xl font-[Playfair Display]">
-              Expire on {new Date(tour.expiry_date).toISOString().split("T")[0]}
-            </Typography>
-          </Box>
-          )}
-
-          <Button
-            sx={{
-              background: 'linear-gradient(to right, #1e3a8a, #4f46e5)', 
-              color: 'white',
-              padding: '7px 20px',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              fontFamily: 'Domine',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: isMobile? 'relative': 'absolute',
-              right: isMobile ? '0vh' : '8vw',
-              top: isMobile ? '-2vh' : 'auto',
-              width: isMobile? '100%': 'auto',
-              '&:hover': {
-                background: 'linear-gradient(to right, #1e40af, #3730a3)', 
-              },
-            }}
-            onClick={handleOpenDialog}
-          >
             
-            Inquire Now
-            <SendIcon sx={{ marginLeft: '10px', fontSize: 'inherit' }} />
-          </Button>
+            <Box className="bg-blue-700 py-3 px-5 shadow-xl">
+              <Typography className="text-white text-6xl font-[Playfair Display]">
+                Food Category: <span style={{ fontWeight: 'bold' }}>{foodCatecoryMap[tour.food_category]}</span>
+              </Typography>
+            </Box>
+            
+            <Box className="bg-gray py-3 px-5 shadow-xl">
+              <Typography className="text-blue-950 text-6xl font-[Playfair Display]">
+                Expire on <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.expiry_date).toISOString().split("T")[0]}</span>
+              </Typography>
+            </Box>
+            
+            <Box className="bg-gray py-3 px-5 shadow-xl">
+              <Typography className="text-blue-950 text-6xl font-[Playfair Display]">
+                Valid from <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.valid_from).toISOString().split("T")[0]}</span> to <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.valid_to).toISOString().split("T")[0]}</span>
+              </Typography>
+            </Box>
+          </Box>
+        )}
         
         {tour.tour_image && (
           <div style={{ display: 'flex',flexDirection: isMobile? 'column' : 'row', alignItems: 'flex-start', gap: '20px' }}>

@@ -11,6 +11,9 @@ const AllTours = () => {
     price: "",
     nights: "",
     expiry_date: "",
+    valid_from: "",
+    valid_to: "",
+    food_category: "",
     country: "",
     markets: [],
     itinerary: {},
@@ -54,6 +57,9 @@ const AllTours = () => {
       price: tour.price,
       nights: tour.nights,
       expiry_date: formatDate(tour.expiry_date),
+      valid_from: formatDate(tour.valid_from),
+      valid_to: formatDate(tour.valid_to),
+      food_category: tour.food_category,
       country: tour.country,
       markets: tour.markets || [] ,
       itinerary: tour.itinerary || {},
@@ -77,6 +83,9 @@ const AllTours = () => {
       price: "",
       nights: "",
       expiry_date: "",
+      valid_from: "",
+      valid_to: "",
+      food_category: "",
       country: "",
       markets: [],
       itinerary: {},
@@ -198,6 +207,12 @@ const AllTours = () => {
     5: 'Russia and CIS',
     6: 'All'
   };
+
+  const foodCategoryMapping = {
+    1: 'Half Board',
+    2: 'Full Board',
+    3: 'All Inclusive',
+  }
   
 
   const handleRemoveImage = (fieldName, index, dayKey) => {
@@ -224,6 +239,9 @@ const AllTours = () => {
         price: formData.price,
         nights: formData.nights,
         expiry_date: formData.expiry_date,
+        valid_from: formData.valid_from,
+        valid_to: formData.valid_to,
+        food_category: formData.food_category,
         country: formData.country,
         markets: formData.markets,  
         tour_summary: formData.tour_summary,
@@ -365,6 +383,41 @@ const AllTours = () => {
                   onChange={handleInputChange}
                   className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                 />
+              </div>
+
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Valid From</label>
+                <input
+                  type="date"
+                  name="valid_from"
+                  value={formData.valid_from}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Valid To</label>
+                <input
+                  type="date"
+                  name="valid_to"
+                  value={formData.valid_to}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Food Category</label>
+                <select name="food_category" onChange={handleInputChange} value={formData.food_category} className="mt-1 p-2 w-full border border-gray-300 rounded-md">
+                  <option value="">Select Food Category</option>
+                  {Object.entries(foodCategoryMapping).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
