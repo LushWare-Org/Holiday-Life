@@ -95,16 +95,18 @@ router.post('/reply', async (req, res) => {
     subject,
     text: replyMessage,
   };
+  
 
   try {
     // Send the reply email
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
 
     await ContactSubmission.findByIdAndUpdate(inquiryId, {
       reply: {
         subject,
         message: replyMessage,
         sentAt: new Date(),
+        info: info,
       },
     });
 
