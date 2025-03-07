@@ -96,7 +96,7 @@ router.post('/reply', async (req, res) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
 
     await Inquiry.findByIdAndUpdate(inquiryId, {
       reply: {

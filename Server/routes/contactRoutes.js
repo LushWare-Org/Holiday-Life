@@ -106,7 +106,6 @@ router.post('/reply', async (req, res) => {
         subject,
         message: replyMessage,
         sentAt: new Date(),
-        info: info,
       },
     });
 
