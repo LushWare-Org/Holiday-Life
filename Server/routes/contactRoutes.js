@@ -5,7 +5,7 @@ const router = express.Router();
 require('dotenv').config(); 
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.titan.email',
+  host: 'smtp.hostinger.com',
   port: 587,
 secure: false,
  
