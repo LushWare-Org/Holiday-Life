@@ -6,7 +6,7 @@ require('dotenv').config();
 
 // Configure Nodemailer transporter using .env variables
 const transporter = nodemailer.createTransport({
-  host: 'smtp.titan.email',
+  host: 'smtp.hostinger.com',
   port: 587,
 secure: false,
 
