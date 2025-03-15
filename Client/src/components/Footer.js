@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -16,6 +16,7 @@ import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import HomeIcon from '@mui/icons-material/Home';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
+import { useNavigate } from 'react-router-dom';
 
 const center = {
   lat: 6.9271,
@@ -45,7 +46,10 @@ function useDeviceType() {
 const Footer = () => {
   const { isMobile, isTablet } = useDeviceType();
 
+  const navigate =useNavigate();
+
   const handleNavigation = (destination) => {
+    navigate('/');
   };
 
   // Inline style objects:
@@ -186,6 +190,8 @@ const Footer = () => {
                     src="https://i.postimg.cc/6Q1tcM0S/HL1.png"
                     alt="Holiday Life Logo"
                     style={logoImgStyle}
+                    onClick={() => handleNavigation('Home')}
+                    curse="pointer"
                   />
                 </div>
                 <Box style={contactItemStyle}>
@@ -259,21 +265,21 @@ const Footer = () => {
         {/* Footer Bottom */}
         <Box style={bottomBoxStyle}>
         <Typography variant="body2" style={bottomTextStyle}>
-          &copy; Copyright {new Date().getFullYear()} - Holiday Life Developed by 
+          &copy; Copyright {new Date().getFullYear()} - Holiday Life Developed by{' '}
           <a 
             href="https://www.lushwebdesigners.com" 
             target="_blank" 
             rel="noopener noreferrer" 
-            style={{ color: '#fff', textDecoration: 'none', marginLeft: '5px' }}
+            style={{ color: '#fff', textDecoration: '', marginLeft: '5px', color: '#07f7b7' }}
           >
-            Lush Web Designers 
-          </a>
-          by
+            Lush Web Designers
+          </a>{' '}
+          by{' '}
           <a 
             href="https://www.lushware.org" 
             target="_blank" 
             rel="noopener noreferrer" 
-            style={{ color: '#fff', textDecoration: 'none', marginLeft: '5px' }}
+            style={{ color: '#fff', textDecoration: '', marginLeft: '5px', color: '#07f7b7' }}
           >
             Lushware Org
           </a>

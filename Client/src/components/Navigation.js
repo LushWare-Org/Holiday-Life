@@ -674,6 +674,8 @@ const Navigation = () => {
                   src="https://i.postimg.cc/6Q1tcM0S/HL1.png"
                   alt="Holiday Life Logo"
                   style={{ height: isTablet? '60px' : '72px', objectFit: 'contain' }}
+                  onClick={() => navigate('/')}
+                  cursor="pointer"
                 />
               </div>
 
