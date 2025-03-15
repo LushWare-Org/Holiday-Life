@@ -660,7 +660,7 @@ const TourDetails = () => {
 
         {/* Itinerary Section */}
         <div><br /><br />
-          <Itinerary />
+          <Itinerary selectedNightsKey={selectedNightsKey} />
         </div>
 
         {/* Back Button */}
