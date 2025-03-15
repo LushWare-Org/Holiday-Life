@@ -4,7 +4,6 @@ import { Grid, Card, CardMedia, CardContent, Typography, Box, Button, CircularPr
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import { TextField, Autocomplete } from '@mui/material';
 import { useCurrency } from '../../screens/CurrencyContext';
 
 const ImageGallery = ( {searchQuery = ''}) => {
