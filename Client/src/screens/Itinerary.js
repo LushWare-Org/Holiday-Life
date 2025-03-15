@@ -33,7 +33,7 @@ const Itinerary = ({selectedNightsKey}) => {
   const [activeTab, setActiveTab] = useState("itinerary");
   const [imageIndices, setImageIndices] = useState([]);
 
-  const { isMobile, isTablet } = useDeviceType();
+  const { isMobile } = useDeviceType();
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -55,7 +55,7 @@ const Itinerary = ({selectedNightsKey}) => {
     fetchTourData();
   }, [id]);
 
-  const nights = selectedNightsKey ? parseInt(selectedNightsKey, 10) : 4;
+  const nights = parseInt(selectedNightsKey, 10);
   const totalDays = nights + 1; // Days = nights + 1
   const middleDaysNeeded = totalDays - 2;
 

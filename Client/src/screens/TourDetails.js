@@ -50,9 +50,9 @@ const TourDetails = () => {
   const currency = useCurrency();
 
   const foodCategoryMap = {
-    1: 'Half Board',
-    2: 'Full Board',
-    3: 'All Inclusive',
+    0: 'Half Board',
+    1: 'Full Board',
+    2: 'All Inclusive',
   }
 
   // New state for selections
