@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-
+import { FaTrash } from "react-icons/fa";
 
 const marketMapping = {
   1: "Indian Market",
