@@ -55,7 +55,7 @@ const Itinerary = ({selectedNightsKey}) => {
     fetchTourData();
   }, [id]);
 
-  const nights = parseInt(selectedNightsKey, 10);
+  const nights = selectedNightsKey ? parseInt(selectedNightsKey, 10) : 4;
   const totalDays = nights + 1; // Days = nights + 1
   const middleDaysNeeded = totalDays - 2;
 
