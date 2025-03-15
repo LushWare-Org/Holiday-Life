@@ -23,13 +23,11 @@ function useDeviceType() {
   return deviceType;
 }
 
-
 const Itinerary = ({selectedNightsKey}) => {
   const { id } = useParams();
   const [tourData, setTourData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [activeTab, setActiveTab] = useState("itinerary");
   const [imageIndices, setImageIndices] = useState([]);
 
@@ -41,10 +39,6 @@ const Itinerary = ({selectedNightsKey}) => {
         setLoading(true);
         const response = await axios.get(`/tours/${id}`);
         setTourData(response.data);
-
-        const totalDays = response.data.nights + 1; 
-        const initialIndices = Array(totalDays).fill(0);
-        setImageIndices(initialIndices);
       } catch (err) {
         console.error("Error fetching tour data:", err);
         setError("Failed to fetch tour details. Please try again.");
