@@ -1,113 +1,19 @@
 import React, { useEffect , useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Box, Button, Divider } from '@mui/material';
-import { PhoneInTalk as PhoneInTalkIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
+import { Typography, Box, Button } from '@mui/material';
 import TourImages from './TourImages';
 import Itinerary from './Itinerary';
 import Footer from '../components/Footer';
 import axios from 'axios';
 import SendIcon from '@mui/icons-material/Send';
-import { Dialog, DialogActions, DialogContent, IconButton, TextField, Autocomplete } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import Swal from 'sweetalert2';
+import { IconButton } from '@mui/material';
 import { useCurrency } from './CurrencyContext';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-
-export const countryCodes = [
-  { code: "+1", label: "🇺🇸" },
-  { code: "+44", label: "🇬🇧" },
-  { code: "+91", label: "🇮🇳" },
-  { code: "+61", label: "🇦🇺" },
-  { code: "+49", label: "🇩🇪" },
-  { code: "+33", label: "🇫🇷" },
-  { code: "+81", label: "🇯🇵" },
-  { code: "+86", label: "🇨🇳" },
-  { code: "+971", label: "🇦🇪" },
-  { code: "+7", label: "🇷🇺" },
-  { code: "+55", label: "🇧🇷" },
-  { code: "+34", label: "🇪🇸" },
-  { code: "+39", label: "🇮🇹" },
-  { code: "+82", label: "🇰🇷" },
-  { code: "+92", label: "🇵🇰" },
-  { code: "+90", label: "🇹🇷" },
-  { code: "+27", label: "🇿🇦" },
-  { code: "+234", label: "🇳🇬" },
-  { code: "+20", label: "🇪🇬" },
-  { code: "+351", label: "🇵🇹" },
-  { code: "+31", label: "🇳🇱" },
-  { code: "+46", label: "🇸🇪" },
-  { code: "+41", label: "🇨🇭" },
-  { code: "+32", label: "🇧🇪" },
-  { code: "+43", label: "🇦🇹" },
-  { code: "+47", label: "🇳🇴" },
-  { code: "+45", label: "🇩🇰" },
-  { code: "+380", label: "🇺🇦" },
-  { code: "+66", label: "🇹🇭" },
-  { code: "+65", label: "🇸🇬" },
-  { code: "+64", label: "🇳🇿" },
-  { code: "+63", label: "🇵🇭" },
-  { code: "+60", label: "🇲🇾" },
-  { code: "+62", label: "🇮🇩" },
-  { code: "+58", label: "🇻🇪" },
-  { code: "+57", label: "🇨🇴" },
-  { code: "+56", label: "🇨🇱" },
-  { code: "+52", label: "🇲🇽" },
-  { code: "+51", label: "🇵🇪" },
-  { code: "+48", label: "🇵🇱" },
-  { code: "+40", label: "🇷🇴" },
-  { code: "+420", label: "🇨🇿" },
-  { code: "+36", label: "🇭🇺" },
-  { code: "+98", label: "🇮🇷" },
-  { code: "+212", label: "🇲🇦" },
-  { code: "+213", label: "🇩🇿" },
-  { code: "+216", label: "🇹🇳" },
-  { code: "+94", label: "🇱🇰" },
-  { code: "+880", label: "🇧🇩" },
-  { code: "+972", label: "🇮🇱" },
-  { code: "+353", label: "🇮🇪" },
-  { code: "+354", label: "🇮🇸" },
-  { code: "+505", label: "🇳🇮" },
-  { code: "+509", label: "🇭🇹" },
-  { code: "+93", label: "🇦🇫" },
-  { code: "+995", label: "🇬🇪" },
-  { code: "+374", label: "🇦🇲" },
-  { code: "+993", label: "🇹🇲" },
-  { code: "+998", label: "🇺🇿" },
-  { code: "+675", label: "🇵🇬" },
-  { code: "+679", label: "🇫🇯" },
-  { code: "+676", label: "🇹🇴" },
-  { code: "+960", label: "🇲🇻" },
-  { code: "+248", label: "🇸🇨" },
-  { code: "+267", label: "🇧🇼" },
-  { code: "+254", label: "🇰🇪" },
-  { code: "+255", label: "🇹🇿" },
-  { code: "+256", label: "🇺🇬" },
-  { code: "+233", label: "🇬🇭" },
-  { code: "+225", label: "🇨🇮" },
-  { code: "+221", label: "🇸🇳" },
-  { code: "+218", label: "🇱🇾" },
-  { code: "+964", label: "🇮🇶" },
-  { code: "+967", label: "🇾🇪" },
-  { code: "+965", label: "🇰🇼" },
-  { code: "+966", label: "🇸🇦" },
-  { code: "+973", label: "🇧🇭" },
-  { code: "+974", label: "🇶🇦" },
-  { code: "+968", label: "🇴🇲" },
-  { code: "+961", label: "🇱🇧" },
-  { code: "+963", label: "🇸🇾" },
-  { code: "+249", label: "🇸🇩" },
-  { code: "+211", label: "🇸🇸" },
-  { code: "+975", label: "🇧🇹" },
-  { code: "+977", label: "🇳🇵" },
-  { code: "+856", label: "🇱🇦" },
-  { code: "+855", label: "🇰🇭" },
-  { code: "+852", label: "🇭🇰" },
-  { code: "+853", label: "🇲🇴" },
-  { code: "+373", label: "🇲🇩" },
-  { code: "+381", label: "🇷🇸" },
-  { code: "+382", label: "🇲🇪" },
-  { code: "+389", label: "🇲🇰" },
-];
+import InquiryForm from '../components/Home/InquiryForm';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import DateRangeIcon from '@mui/icons-material/DateRange';
 
 function useDeviceType() {
   const [deviceType, setDeviceType] = useState({
@@ -135,14 +41,6 @@ const TourDetails = () => {
   const navigate = useNavigate();
   const [tour, setTour] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneNumbe1, setPhoneNumber1] = useState('');
-  const [travelDate, setTravelDate] = useState('');
-  const [travellerCount, setTravellerCount] = useState('');
-  const [message, setMessage] = useState('');
   const [exchangeRates, setExchangeRates] = useState({});
 
   const { isMobile, isTablet } = useDeviceType();
@@ -151,11 +49,17 @@ const TourDetails = () => {
 
   const currency = useCurrency();
 
-  const foodCatecoryMap = {
+  const foodCategoryMap = {
     1: 'Half Board',
     2: 'Full Board',
     3: 'All Inclusive',
   }
+
+  // New state for selections
+  const [selectedNightsKey, setSelectedNightsKey] = useState(null);
+  const [selectedNightsOption, setSelectedNightsOption] = useState(null);
+  const [selectedFoodCategory, setSelectedFoodCategory] = useState(null);
+  
 
   const convertPrice = (priceInUSD) => {
     if (!exchangeRates[currency]) return priceInUSD.toLocaleString();
@@ -193,6 +97,55 @@ const TourDetails = () => {
     fetchTourDetails();
   }, [id]); 
 
+  // Initialize selection defaults when tour data loads
+  useEffect(() => {
+    if (tour) {
+      // Initialize nights selection if the tour.nights is an object (new structure)
+      if (tour.nights && typeof tour.nights === 'object') {
+        const nightsKeys = Object.keys(tour.nights);
+        if (nightsKeys.length > 0) {
+          setSelectedNightsKey(nightsKeys[0]);
+          const firstOptions = tour.nights[nightsKeys[0]];
+          const optionKeys = Object.keys(firstOptions);
+          if (optionKeys.length > 0) {
+            setSelectedNightsOption(optionKeys[0]);
+          }
+        }
+      }
+      // Initialize food category selection
+      if (tour.food_category && typeof tour.food_category === 'object') {
+        const foodKeys = Object.keys(tour.food_category);
+        if (foodKeys.length > 0) {
+          setSelectedFoodCategory(foodKeys[0]);
+        }
+      }
+    }
+  }, [tour]);
+
+  // Compute total price based on selections
+  const basePrice = tour ? tour.price : 0;
+  const oldBasePrice = tour ? tour.oldPrice : 0;
+  const nightsAddPrice = (selectedNightsKey && selectedNightsOption && tour && tour.nights[selectedNightsKey])
+    ? tour.nights[selectedNightsKey][selectedNightsOption].add_price
+    : 0;
+  const foodAddPrice = (selectedFoodCategory && tour && tour.food_category)
+    ? tour.food_category[selectedFoodCategory][0]
+    : 0;
+  const totalPrice = basePrice + nightsAddPrice + foodAddPrice;
+
+  const nightsOldPrice = (selectedNightsKey && selectedNightsOption && tour && tour.nights[selectedNightsKey])
+    ? tour.nights[selectedNightsKey][selectedNightsOption].old_add_price
+    : 0;
+  const foodOldPrice = (selectedFoodCategory && tour && tour.food_category)
+    ? tour.food_category[selectedFoodCategory][1]
+    : 0;
+
+  const finalOldPrice = oldBasePrice + nightsOldPrice + foodOldPrice;
+
+  // Compute days and nights based on selection (if available)
+  const nightsCount = selectedNightsKey ? parseInt(selectedNightsKey) : 0;
+  const daysCount = nightsCount + 1;
+
   const [openDialog, setOpenDialog] = useState(false);
 
   if (loading) {
@@ -205,51 +158,6 @@ const TourDetails = () => {
 
   // Handlers to open/close
   const handleOpenDialog = () => setOpenDialog(true);
-  const handleCloseDialog = () => setOpenDialog(false);
-
-  const handleSubmit = async (e) => {
-    try {
-      // Construct the object we want to send
-      const payload = {
-        name,
-        email,
-        phone_number: `${phoneNumber}${phoneNumbe1}`,
-        travel_date: travelDate,
-        traveller_count: travellerCount,
-        message,
-        tour_id: tour?._id || '', 
-      };
-
-      const response = await axios.post(
-        '/inquiries',
-        payload
-      );
-      Swal.fire({
-        title: 'Success!',
-        text: 'Your inquiry has been submitted successfully.',
-        icon: 'success',
-        confirmButtonText: 'OK'
-      });
-
-      // Reset form fields or close the dialog
-      setName('');
-      setEmail('');
-      setPhoneNumber('');
-      setTravelDate('');
-      setTravellerCount('');
-      setMessage('');
-
-      setOpenDialog(false);
-    } catch (error) {
-      Swal.fire({
-        title: 'Oops!',
-        text: 'Something went wrong while submitting your inquiry. Please try again.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      setOpenDialog(false);
-    }
-  };
 
   return (
     <>
@@ -269,47 +177,400 @@ const TourDetails = () => {
           {tour.title}
         </Typography>
         {/* Days & Nights */}
+        
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            justifyContent: 'space-between',
+            alignItems: isMobile ? 'flex-start' : 'flex-start',
+            gap: 0,
+            mb: 2,
+            padding: '0 40px',
+          }}
+        >
+          {/* --- Selections for Nights and Food Category --- */}
+          <Box sx={{ marginBottom: '30px', display: 'flex',flexDirection: 'column', gap: 2}}>
+            {/* Nights selection */}
+            {tour.nights && (
+              <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ mr: 2 }}>Select Nights:</Typography>
+                {Object.keys(tour.nights).map((key) => (
+                  <Box
+                    key={key}
+                    onClick={() => {
+                      setSelectedNightsKey(key);
+                      setSelectedNightsOption(Object.keys(tour.nights[key])[0]);
+                    }}
+                    sx={{
+                      border: selectedNightsKey === key ? '2px solid blue' : '1px solid grey',
+                      borderRadius: 1,
+                      p: 1,
+                      mr: 1,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Typography>{key} Nights</Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+
+            {/* Option selection for chosen nights */}
+            {selectedNightsKey && tour.nights[selectedNightsKey] && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Select Option for {selectedNightsKey} Nights:
+                </Typography>
+                {Object.keys(tour.nights[selectedNightsKey]).map((optKey) => (
+                  <Box
+                    key={optKey}
+                    onClick={() => setSelectedNightsOption(optKey)}
+                    sx={{
+                      border: selectedNightsOption === optKey ? '2px solid blue' : '1px solid grey',
+                      borderRadius: 1,
+                      p: 1,
+                      mb: 1,
+                      cursor: 'pointer',
+                      width: '100%'
+                    }}
+                  >
+                    <Typography>
+                      {tour.nights[selectedNightsKey][optKey].option} 
+                      <Typography
+                        component="span"
+                        sx={{ color: 'gray', ml: 1 }}
+                      >
+                        (+{selectedCurrency}{" "}
+                        {convertPrice(tour.nights[selectedNightsKey][optKey].add_price)}
+                        )
+                      </Typography>
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+
+            {/* Food Category selection */}
+            {tour.food_category && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1 }}>Select Food Category:</Typography>
+                {Object.keys(tour.food_category).map((key) => (
+                  <Box
+                    key={key}
+                    onClick={() => setSelectedFoodCategory(key)}
+                    sx={{
+                      border: selectedFoodCategory === key ? '2px solid blue' : '1px solid grey',
+                      borderRadius: 1,
+                      p: 1,
+                      mb: 1,
+                      cursor: 'pointer',
+                      width: 'fit-content',
+                      minWidth: { xs: '100%', sm: 'auto'}
+                    }}
+                  >
+                    <Typography>
+                      {foodCategoryMap[key]} 
+                      <Typography
+                        component="span"
+                        sx={{ color: 'gray', ml: 1 }}
+                      >
+                        (+{selectedCurrency}{" "}
+                        {convertPrice(tour.food_category[key][0])}
+                        )
+                      </Typography>
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+          {/* RIGHT: Enhanced info cards */}
+          {!isMobile && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+                width: '400px',
+              }}
+            >
+              {/* Days/Nights Card */}
+              <Box
+                sx={{
+                  background: 'linear-gradient(135deg, #1a365d 0%, #2563eb 100%)',
+                  borderRadius: '16px',
+                  padding: '15px',
+                  color: 'white',
+                  boxShadow: '0 10px 20px rgba(37, 99, 235, 0.2)',
+                  transform: 'translateY(0)',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 15px 30px rgba(37, 99, 235, 0.3)',
+                  },
+                }}
+              >
+                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                  <AccessTimeIcon sx={{ fontSize: 32, mr: 1 }} />
+                  {daysCount} Days / {nightsCount} Nights
+                </Typography>
+              </Box>
+
+              {/* Price Card */}
+              <Box
+                sx={{
+                  background: 'linear-gradient(135deg, #065f46 0%, #059669 100%)',
+                  borderRadius: '16px',
+                  padding: '15px',
+                  color: 'white',
+                  boxShadow: '0 10px 20px rgba(5, 150, 105, 0.2)',
+                  transform: 'translateY(0)',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 15px 30px rgba(5, 150, 105, 0.3)',
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0 }}>
+                  <AttachMoneyIcon sx={{ fontSize: 32, mr: 1 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                    Price
+                  </Typography>
+                </Box>
+                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                  {selectedCurrency} {convertPrice(totalPrice)}
+                </Typography>
+                {finalOldPrice > totalPrice && (
+                  <Typography 
+                    sx={{ 
+                      textDecoration: 'line-through',
+                      color: 'rgba(255,255,255,0.7)',
+                    }}
+                  >
+                    {selectedCurrency} {convertPrice(finalOldPrice)}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Expiry Card */}
+              <Box
+                sx={{
+                  background: 'linear-gradient(135deg, #991b1b 0%, #dc2626 100%)',
+                  borderRadius: '16px',
+                  padding: '15px',
+                  color: 'white',
+                  boxShadow: '0 10px 20px rgba(220, 38, 38, 0.2)',
+                  transform: 'translateY(0)',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 15px 30px rgba(220, 38, 38, 0.3)',
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <CalendarMonthIcon sx={{ fontSize: 32, mr: 1 }} />
+                  <Typography variant="h5" sx={{ fontWeight: 500 }}>
+                    Expires On
+                  </Typography>
+                </Box>
+                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                  {new Date(tour.expiry_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </Typography>
+              </Box>
+
+              {/* Validity Card */}
+              <Box
+                sx={{
+                  background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+                  borderRadius: '16px',
+                  padding: '15px',
+                  color: 'white',
+                  boxShadow: '0 10px 20px rgba(59, 130, 246, 0.2)',
+                  transform: 'translateY(0)',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 15px 30px rgba(59, 130, 246, 0.3)',
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <DateRangeIcon sx={{ fontSize: 32, mr: 1 }} />
+                  <Typography variant="h5" sx={{ fontWeight: 500 }}>
+                    Valid Period
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    {new Date(tour.valid_from).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </Typography>
+                  -
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    {new Date(tour.valid_to).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </Typography>
+                  </Box>
+              </Box>
+            </Box>
+          )}
+        </Box>
+
         {isMobile && (
           <Box 
             sx={{ 
               display: 'flex', 
-              flexWrap: 'wrap', 
-              justifyContent: 'center', 
-              gap: 1, 
+              flexDirection: 'column',
+              gap: 1,
               mb: 5
             }}
           >
-            {/* First Row - first two boxes */}
-            <Box sx={{ flexBasis: 'calc(50% - 6px)' }} className="bg-blue-700 py-3 px-0 shadow-xl text-center">
-              <Typography className="text-white text-6xl font-[Playfair Display]">
-                {tour.nights + 1} Days / {tour.nights} Nights
-              </Typography>
-            </Box>
-            <Box sx={{ flexBasis: 'calc(50% - 6px)' }} className="bg-blue-700 py-3 px-1 shadow-xl text-center">
-              <Typography className="text-white text-7xl font-[Domine]">
-              Price: <span style={{ fontWeight: 'bold' }}>{selectedCurrency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}</span>
+            {/* Days/Nights Card */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #1a365d 0%, #2563eb 100%)',
+                borderRadius: '16px',
+                padding: '15px',
+                color: 'white',
+                boxShadow: '0 10px 20px rgba(37, 99, 235, 0.2)',
+                transform: 'translateY(0)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 15px 30px rgba(37, 99, 235, 0.3)',
+                },
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                <AccessTimeIcon sx={{ fontSize: 25, mr: 1 }} />
+                {daysCount} Days / {nightsCount} Nights
               </Typography>
             </Box>
 
-            <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }} className="bg-blue-700 py-3 px-1 shadow-xl text-center">
-              <Typography className="text-white text-6xl font-[Playfair Display]">
-                Food Category: <span style={{ fontWeight: 'bold' }}>{foodCatecoryMap[tour.food_category]}</span>
-              </Typography>
-            </Box>
-
-            {/* Second Row - third box */}
-            <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
-              <Box className="bg-gray py-3 px-6 shadow-xl w-full text-center">
-                <Typography className="text-blue-900 text-6xl font-[Playfair Display]">
-                  Expire on <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.expiry_date).toISOString().split("T")[0]}</span>
+            {/* Price Card */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #065f46 0%, #059669 100%)',
+                borderRadius: '16px',
+                padding: '15px',
+                color: 'white',
+                boxShadow: '0 10px 20px rgba(5, 150, 105, 0.2)',
+                transform: 'translateY(0)',
+                transition: 'transform 0.3s ease, boxShadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 15px 30px rgba(5, 150, 105, 0.3)',
+                },
+                textAlign: 'center',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
+                <AttachMoneyIcon sx={{ fontSize: 25, mr: 1 }} />
+                <Typography variant="h5" sx={{ fontWeight: 500 }}>
+                  Price
                 </Typography>
               </Box>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {selectedCurrency} {convertPrice(totalPrice)}
+              </Typography>
+              {finalOldPrice > totalPrice && (
+                <Typography 
+                  sx={{ 
+                    textDecoration: 'line-through',
+                    color: 'rgba(255,255,255,0.7)',
+                  }}
+                >
+                  {selectedCurrency} {convertPrice(finalOldPrice)}
+                </Typography>
+              )}
             </Box>
 
-            <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
-              <Box className="bg-gray py-3 px-6 shadow-xl w-full text-center">  
-                <Typography className="text-blue-900 text-6xl font-[Playfair Display]">
-                Valid from <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.valid_from).toISOString().split("T")[0]}</span> to <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.valid_to).toISOString().split("T")[0]}</span>
+            {/* Expires On Card */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #991b1b 0%, #dc2626 100%)',
+                borderRadius: '16px',
+                padding: '15px',
+                color: 'white',
+                boxShadow: '0 10px 20px rgba(220, 38, 38, 0.2)',
+                transform: 'translateY(0)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 15px 30px rgba(220, 38, 38, 0.3)',
+                },
+                textAlign: 'center',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
+                <CalendarMonthIcon sx={{ fontSize: 32, mr: 1 }} />
+                <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                  Expires On
+                </Typography>
+              </Box>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {new Date(tour.expiry_date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </Typography>
+            </Box>
+
+            {/* Valid Period Card */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+                borderRadius: '16px',
+                padding: '15px',
+                color: 'white',
+                boxShadow: '0 10px 20px rgba(59, 130, 246, 0.2)',
+                transform: 'translateY(0)',
+                transition: 'transform 0.3s ease, boxShadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 15px 30px rgba(59, 130, 246, 0.3)',
+                },
+                textAlign: 'center',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
+                <DateRangeIcon sx={{ fontSize: 32, mr: 1 }} />
+                <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                  Valid Period
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  {new Date(tour.valid_from).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  to
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  {new Date(tour.valid_to).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
                 </Typography>
               </Box>
             </Box>
@@ -327,9 +588,6 @@ const TourDetails = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginTop: '20px',
-                  position: isMobile? 'relative': 'absolute',
-                  right: isMobile ? '0vh' : '8vw',
-                  top: isMobile ? '-2vh' : 'auto',
                   width: isMobile? '100%': 'auto',
                   '&:hover': {
                     background: 'linear-gradient(to right, #1e40af, #3730a3)', 
@@ -343,48 +601,6 @@ const TourDetails = () => {
               </Button>
             </Box>
         </Box>
-        )}
-
-        { !isMobile && (
-          <Box 
-            sx={{ 
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '20px',
-              justifyContent: 'space-between',
-              marginBottom: '30px'
-            }}
-          >
-            <Box className="bg-blue-700 py-3 px-5 shadow-xl">
-              <Typography className="text-white text-6xl font-[Playfair Display]">
-                {tour.nights + 1} Days / {tour.nights} Nights
-              </Typography>
-            </Box>
-            
-            <Box className="bg-blue-700 py-3 px-5 shadow-xl">
-              <Typography className="text-white text-7xl font-[Domine]">
-                Price: <span style={{ fontWeight: 'bold' }}>{selectedCurrency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}</span>
-              </Typography>
-            </Box>  
-            
-            <Box className="bg-blue-700 py-3 px-5 shadow-xl">
-              <Typography className="text-white text-6xl font-[Playfair Display]">
-                Food Category: <span style={{ fontWeight: 'bold' }}>{foodCatecoryMap[tour.food_category]}</span>
-              </Typography>
-            </Box>
-            
-            <Box className="bg-gray py-3 px-5 shadow-xl">
-              <Typography className="text-blue-950 text-6xl font-[Playfair Display]">
-                Expire on <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.expiry_date).toISOString().split("T")[0]}</span>
-              </Typography>
-            </Box>
-            
-            <Box className="bg-gray py-3 px-5 shadow-xl">
-              <Typography className="text-blue-950 text-6xl font-[Playfair Display]">
-                Valid from <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.valid_from).toISOString().split("T")[0]}</span> to <span style={{ fontWeight: 'bold', color: 'red' }}>{new Date(tour.valid_to).toISOString().split("T")[0]}</span>
-              </Typography>
-            </Box>
-          </Box>
         )}
         
         {tour.tour_image && (
@@ -484,186 +700,20 @@ const TourDetails = () => {
           </Button>
         </div>
         <div>
-            <Dialog
-              open={openDialog}
-              onClose={handleCloseDialog}
-              PaperProps={{
-                sx: {
-                  width: isMobile? '95vwvw' : '35vw',
-                  borderRadius: isMobile? '10px' : '16px',
-                  overflowX: 'hidden',
-                },
-              }}
-            >
-              {/* Header Section */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  padding: '16px',
-                }}
-              >
-                {/* Left: Image, Title, and Prices */}
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {tour?.tour_image && (
-                    <img
-                      src={tour.tour_image}
-                      alt={tour.title}
-                      style={{
-                        width: '60px',
-                        height: '60px',
-                        objectFit: 'cover',
-                        borderRadius: '4px',
-                        marginRight: '16px',
-                      }}
-                    />
-                  )}
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {tour?.title || 'Tour Title'}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mt: '4px' }}>
-                      <Typography
-                        sx={{
-                          color: '#333',
-                          fontSize: '1.15rem',
-                          fontWeight: 700,
-                        }}
-                      >
-                        {tour?.price
-                          ? `${selectedCurrency} ${tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : ''}`
-                          : 'Price not available'}
-                      </Typography>
-                      {tour?.oldPrice && (
-                        <Typography
-                          sx={{
-                            ml: '8px',
-                            color: '#888',
-                            textDecoration: 'line-through',
-                            fontSize: '0.9rem',
-                          }}
-                        >
-                          {selectedCurrency} {tour.oldPrice && !isNaN(tour.oldPrice) ? convertPrice(tour.oldPrice) : ''}
-                        </Typography>
-                      )}
-                      {tour?.price && tour?.oldPrice && (
-                        <Typography
-                          sx={{
-                            ml: '8px',
-                            backgroundColor: 'green',
-                            color: 'white',
-                            padding: '2px 6px',
-                            borderRadius: '4px',
-                            fontSize: '0.75rem',
-                            fontWeight: 'bold',
-                          }}
-                        >
-                          SAVE {selectedCurrency} {convertPrice(tour.oldPrice - tour.price)}
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
-
-                {/* Close Button */}
-                <IconButton onClick={handleCloseDialog}>
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-
-              <Divider />
-
-              {/* Form Section */}
-              <DialogContent sx={{ pt: 0 , pb: '0px', px: isMobile? '10px' : '16px' }}>
-                <TextField
-                  required
-                  label="Full Name"
-                  fullWidth
-                  margin="normal"
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <TextField
-                  required
-                  label="Email"
-                  type="email"
-                  fullWidth
-                  margin="normal"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <Box sx={{ display: 'flex', gap: '8px', mt: 2 }}>
-                  <Autocomplete
-                    options={countryCodes}
-                    getOptionLabel={(option) => `${option.label} ${option.code}`}
-                    renderOption={(props, option) => (
-                      <Box component="li" {...props} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography>{option.label}</Typography>
-                        <Typography>{option.code}</Typography>
-                      </Box>
-                    )}
-                    renderInput={(params) => <TextField {...params} label="Country Code" />}
-                    onChange={(event, newValue) => setPhoneNumber(newValue ? newValue.code : '')}
-                    sx={{ width: '200px' }}
-                  />
-                  <TextField
-                    required
-                    label="Your Phone"
-                    fullWidth
-                    type="tel"
-                    onChange={(e) => setPhoneNumber1(e.target.value)}
-                  />
-                </Box>
-                <Box sx={{ display: 'flex', gap: '8px', mt: 2 }}>
-                  <TextField
-                    required
-                    label="Travel Date"
-                    fullWidth
-                    type="date"
-                    InputLabelProps={{ shrink: true }}
-                    onChange={(e) => setTravelDate(e.target.value)}
-                  />
-                  <TextField
-                    required
-                    label="Traveller Count"
-                    fullWidth
-                    type="number"
-                    InputProps={{ inputProps: { min: 1 } }}
-                    onChange={(e) => setTravellerCount(e.target.value)}
-                  />
-                </Box>
-                <TextField
-                  label="Message..."
-                  multiline
-                  rows={3}
-                  fullWidth
-                  margin="normal"
-                  onChange={(e) => setMessage(e.target.value)}
-                />
-              </DialogContent>
-
-              {/* Bottom Section */}
-              <DialogActions sx={{ justifyContent: 'center', pb: '16px' }}>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    // Handle form submission logic here
-                    handleSubmit();
-                  }}
-                  sx={{
-                    backgroundColor: '#016170',
-                    color: '#fff',
-                    padding: '8px 16px',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    '&:hover': {
-                      backgroundColor: '#e65c00',
-                    },
-                  }}
-                >
-                  Connect with an Expert
-                </Button>
-              </DialogActions>
-            </Dialog>
+          <InquiryForm
+            open={openDialog}
+            onClose={() => setOpenDialog(false)}
+            selectedTour={tour}
+            selectedCurrency={selectedCurrency}
+            convertPrice={convertPrice}
+            isMobile={isMobile}
+            // Add these new props:
+            finalPrice={totalPrice} 
+            finalOldPrice={finalOldPrice}
+            selectedNightsKey={selectedNightsKey}   // e.g. "4"
+            selectedNightsOption={selectedNightsOption} // e.g. "0"
+            selectedFoodCategory={selectedFoodCategory} // e.g. "1"
+          />
         </div>
       </Box>
       <Footer />

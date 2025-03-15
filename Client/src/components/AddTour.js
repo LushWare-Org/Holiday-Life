@@ -1,62 +1,111 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { FaTrash } from "react-icons/fa";
-import axios from "axios";
 
 const marketMapping = {
-  1: 'Indian',
-  2: 'Chinese',
-  3: 'Asian',
-  4: 'Middle East',
-  5: 'Russia and CIS',
-  6: 'All'
+  1: "Indian Market",
+  2: "Chinese Market",
+  3: "Asian Markets",
+  4: "Middle East Markets",
+  5: "Russia and CIS Markets",
+  6: "All Markets",
 };
 
-const foodCategoryMapping ={
-  1: 'Half Board',
-  2: 'Full Board',
-  3: 'All Inclusive',
-}
+const foodCategoryMapping = {
+  0: "Half Board",
+  1: "Full Board",
+  2: "All Inclusive",
+};
 
 const TourForm = () => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
+    // Base nights used for itinerary generation. It will also serve as the key for nights options.
     nights: "",
     expiry_date: "",
     valid_from: "",
     valid_to: "",
-    food_category: "",
+    food_category: {
+      0: [0, 0],
+      1: [0, 0],
+      2: [0, 0],
+    },
     country: "",
     markets: [],
-    itinerary: {}, // Stores activities for each day as a string (later split into an array)
-    itineraryImages: {}, // Stores images for each day
-    itineraryTitles: {}, // Stores titles for each day
+    tour_summary: "",
+    oldPrice: "",
+    inclusions: "",
+    exclusions: "",
+    // New field: facilities (entered one per line)
+    facilities: "",
     tour_image: [],
     destination_images: [],
     activity_images: [],
     hotel_images: [],
-    inclusions: "",
-    exclusions: "",
-    tour_summary: "",
-    oldPrice: "",
+    // Itinerary structure is now split into arrival (first_day), dynamic middle_days, and departure (last_day)
+    itinerary: {
+      first_day: "",
+      middle_days: {},
+      last_day: "",
+    },
+    itineraryImages: {
+      first_day: [],
+      middle_days: {},
+      last_day: [],
+    },
+    itineraryTitles: {
+      first_day: "",
+      middle_days: {},
+      last_day: "",
+    },
+    // New field: nightsOptions is an object mapping the base nights (as a key) to an array of option objects.
+    nightsOptions: {},
+  });
+
+  // Local state for adding a new nights option.
+  const [nightsOptionForm, setNightsOptionForm] = useState({
+    option: "",
+    add_price: "",
+    old_add_price: ""
   });
 
   const [showItinerary, setShowItinerary] = useState(false);
-  const [showRestItinerary, setShowRestItinerary] = useState(false);
   const [isItinerarySubmitted, setIsItinerarySubmitted] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Adjust the itinerary based on the number of nights
+  // When the base nights change, dynamically generate the itinerary fields.
   useEffect(() => {
-    const numberOfDays = parseInt(formData.nights) + 1; // Days = nights + 1
-    const newItinerary = {};
-    const newItineraryImages = {};
-    const newItineraryTitles = {};
-    for (let i = 1; i <= numberOfDays; i++) {
-      newItinerary[`day_${i}`] = ""; // Initialize an empty string for each day's activities
-      newItineraryImages[`day_${i}`] = []; // Initialize an empty array for images
-      newItineraryTitles[`day_${i}`] = `Day ${i} Title`; // Default title
+    const nightsNumber = parseInt(formData.nights);
+    if (!nightsNumber) return;
+    // Total days = nights + 1 (arrival + nights)
+    const totalDays = nightsNumber + 1;
+    const newItinerary = {
+      first_day: formData.itinerary.first_day || "",
+      middle_days: {},
+      last_day: formData.itinerary.last_day || "",
+    };
+    const newItineraryImages = {
+      first_day: formData.itineraryImages.first_day || [],
+      middle_days: {},
+      last_day: formData.itineraryImages.last_day || [],
+    };
+    const newItineraryTitles = {
+      first_day: formData.itineraryTitles.first_day || "Arrival Day Title",
+      middle_days: {},
+      last_day: formData.itineraryTitles.last_day || "Departure Day Title",
+    };
+
+    if (totalDays > 2) {
+      // For example, if totalDays is 5 (4 nights), generate middle days for Day 2, 3, and 4.
+      for (let i = 2; i < totalDays; i++) {
+        newItinerary.middle_days[`day_${i}`] =
+          formData.itinerary.middle_days?.[`day_${i}`] || "";
+        newItineraryImages.middle_days[`day_${i}`] =
+          formData.itineraryImages.middle_days?.[`day_${i}`] || [];
+        newItineraryTitles.middle_days[`day_${i}`] =
+          formData.itineraryTitles.middle_days?.[`day_${i}`] || `Day ${i} Title`;
+      }
     }
     setFormData((prevData) => ({
       ...prevData,
@@ -73,108 +122,280 @@ const TourForm = () => {
     });
   };
 
-  const handleItineraryChange = (e, dayKey) => {
-    const { value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      itinerary: {
-        ...prevData.itinerary,
-        [dayKey]: value,
-      },
-    }));
-  };
-
-  const handleItineraryTitleChange = (e, dayKey) => {
-    const { value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      itineraryTitles: {
-        ...prevData.itineraryTitles,
-        [dayKey]: value,
-      },
-    }));
-  };
-
-  const handleImageUpload = async (e, fieldName, dayKey) => {
-    const files = Array.from(e.target.files);
-    const uploadedUrls = [];
-  
-    for (const file of files) {
-      const uploadFormData = new FormData();
-      uploadFormData.append('image', file);
-  
-      try {
-        // Display loading indicator
-        const loadingUrl = URL.createObjectURL(file);
-        if (dayKey) {
-          setFormData((prevData) => ({
-            ...prevData,
-            itineraryImages: {
-              ...prevData.itineraryImages,
-              [dayKey]: [...prevData.itineraryImages[dayKey], loadingUrl],
-            },
-          }));
-        } else {
-          setFormData((prevData) => ({
-            ...prevData,
-            [fieldName]: [...prevData[fieldName], loadingUrl],
-          }));
-        }
-  
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39`, {
-          method: 'POST',
-          body: uploadFormData,
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Failed to upload image: ${response.statusText}`);
-        }
-  
-        const data = await response.json();
-        uploadedUrls.push(data.data.url); // Assuming the response contains the URL in `data.data.url`
-  
-        // Replace loading indicator with the actual uploaded image URL
-        if (dayKey) {
-          setFormData((prevData) => ({
-            ...prevData,
-            itineraryImages: {
-              ...prevData.itineraryImages,
-              [dayKey]: prevData.itineraryImages[dayKey].map((url) =>
-                url === loadingUrl ? data.data.url : url
-              ),
-            },
-          }));
-        } else {
-          setFormData((prevData) => ({
-            ...prevData,
-            [fieldName]: prevData[fieldName].map((url) =>
-              url === loadingUrl ? data.data.url : url
-            ),
-          }));
-        }
-      } catch (error) {
-        console.error('Error uploading image:', error);
-      }
-    }
-  };
-
-  const handleRemoveImage = (fieldName, index, dayKey) => {
-    if (dayKey) {
+  // Update itinerary text for a section (first_day, last_day, or middle_days).
+  const handleItineraryChange = (e, section, dayKey = null) => {
+    const value = e.target.value;
+    if (section === "middle_days" && dayKey) {
       setFormData((prevData) => ({
         ...prevData,
-        itineraryImages: {
-          ...prevData.itineraryImages,
-          [dayKey]: prevData.itineraryImages[dayKey].filter((_, i) => i !== index),
+        itinerary: {
+          ...prevData.itinerary,
+          middle_days: {
+            ...prevData.itinerary.middle_days,
+            [dayKey]: value,
+          },
         },
       }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
-        [fieldName]: prevData[fieldName].filter((_, i) => i !== index),
+        itinerary: {
+          ...prevData.itinerary,
+          [section]: value,
+        },
       }));
     }
   };
 
+  // Update itinerary title for each section.
+  const handleItineraryTitleChange = (e, section, dayKey = null) => {
+    const value = e.target.value;
+    if (section === "middle_days" && dayKey) {
+      setFormData((prevData) => ({
+        ...prevData,
+        itineraryTitles: {
+          ...prevData.itineraryTitles,
+          middle_days: {
+            ...prevData.itineraryTitles.middle_days,
+            [dayKey]: value,
+          },
+        },
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        itineraryTitles: {
+          ...prevData.itineraryTitles,
+          [section]: value,
+        },
+      }));
+    }
+  };
+
+  const handleImageUpload = async (e, key, section) => {
+    const files = Array.from(e.target.files);
+    for (const file of files) {
+      const formDataImage = new FormData();
+      formDataImage.append("image", file);
+      const loadingUrl = URL.createObjectURL(file);
+  
+      if (section === "middle_days" && key) {
+        setFormData((prevData) => ({
+          ...prevData,
+          itineraryImages: {
+            ...prevData.itineraryImages,
+            middle_days: {
+              ...prevData.itineraryImages.middle_days,
+              [key]: [
+                // //// CHANGED: Ensure previous value is an array; fallback to [] if not.
+                ...(Array.isArray(prevData.itineraryImages.middle_days[key])
+                  ? prevData.itineraryImages.middle_days[key]
+                  : []),
+                loadingUrl,
+              ],
+            },
+          },
+        }));
+      } else if (
+        section === "tour_image" ||
+        section === "destination_images" ||
+        section === "activity_images" ||
+        section === "hotel_images"
+      ) {
+        setFormData((prevData) => ({
+          ...prevData,
+          [section]: [
+            // //// CHANGED: Ensure previous value is an array; fallback to [] if not.
+            ...(Array.isArray(prevData[section]) ? prevData[section] : []),
+            loadingUrl,
+          ],
+        }));
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          itineraryImages: {
+            ...prevData.itineraryImages,
+            [key]: [
+              // //// CHANGED: Ensure previous value is an array; fallback to [] if not.
+              ...(Array.isArray(prevData.itineraryImages[key])
+                ? prevData.itineraryImages[key]
+                : []),
+              loadingUrl,
+            ],
+          },
+        }));
+      }
+  
+      try {
+        const response = await fetch(
+          "https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39",
+          {
+            method: "POST",
+            body: formDataImage,
+          }
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to upload image: ${response.statusText}`);
+        }
+        const data = await response.json();
+        const uploadedUrl = data.data.url;
+        if (section === "middle_days" && key) {
+          setFormData((prevData) => ({
+            ...prevData,
+            itineraryImages: {
+              ...prevData.itineraryImages,
+              middle_days: {
+                ...prevData.itineraryImages.middle_days,
+                [key]: (Array.isArray(prevData.itineraryImages.middle_days[key])
+                  ? prevData.itineraryImages.middle_days[key]
+                  : []).map((url) =>
+                  url === loadingUrl ? uploadedUrl : url
+                ),
+              },
+            },
+          }));
+        } else if (
+          section === "tour_images" ||
+          section === "destination_images" ||
+          section === "activity_images" ||
+          section === "hotel_images"
+        ) {
+          setFormData((prevData) => ({
+            ...prevData,
+            [section]: (Array.isArray(prevData[section])
+              ? prevData[section]
+              : []).map((url) =>
+              url === loadingUrl ? uploadedUrl : url
+            ),
+          }));
+        } else {
+          setFormData((prevData) => ({
+            ...prevData,
+            itineraryImages: {
+              ...prevData.itineraryImages,
+              [key]: (Array.isArray(prevData.itineraryImages[key])
+                ? prevData.itineraryImages[key]
+                : []).map((url) =>
+                url === loadingUrl ? uploadedUrl : url
+              ),
+            },
+          }));
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    }
+  };
+
+  const handleRemoveImage = (key, index, section) => {
+    if (section === "middle_days") {
+      // //// ADDED: Remove image from the middle_days object in itineraryImages.
+      setFormData((prevData) => ({
+        ...prevData,
+        itineraryImages: {
+          ...prevData.itineraryImages,
+          middle_days: {
+            ...prevData.itineraryImages.middle_days,
+            [key]: Array.isArray(prevData.itineraryImages.middle_days[key])
+              ? prevData.itineraryImages.middle_days[key].filter((_, i) => i !== index)
+              : []
+          }
+        }
+      }));
+    } else if (
+      section === "tour_images" ||
+      section === "destination_images" ||
+      section === "activity_images" ||
+      section === "hotel_images"
+    ) {
+      // //// ADDED: Remove image from standard image arrays.
+      setFormData((prevData) => ({
+        ...prevData,
+        [section]: Array.isArray(prevData[section])
+          ? prevData[section].filter((_, i) => i !== index)
+          : []
+      }));
+    } else {
+      // //// ADDED: Remove image from itineraryImages for sections like "first_day" or "last_day".
+      setFormData((prevData) => ({
+        ...prevData,
+        itineraryImages: {
+          ...prevData.itineraryImages,
+          [key]: Array.isArray(prevData.itineraryImages[key])
+            ? prevData.itineraryImages[key].filter((_, i) => i !== index)
+            : []
+        }
+      }));
+    }
+  };
+
+  const handleFoodCategoryChange = (catKey, index, val) => {
+    const parsedVal = parseInt(val, 10) || 0;
+    setFormData((prev) => {
+      // //// CHANGED: Use array notation.
+      const oldArray = prev.food_category[catKey] || [0, 0];
+      const newArray = [...oldArray];
+      newArray[index] = parsedVal;
+      return {
+        ...prev,
+        food_category: {
+          ...prev.food_category,
+          [catKey]: newArray,
+        },
+      };
+    });
+  };
+
+  // Handling input changes for the new nights option form.
+  const handleNightsOptionInputChange = (e) => {
+    setNightsOptionForm({
+      ...nightsOptionForm,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // Add a new nights option for the current base nights.
+  const addNightsOption = () => {
+    if (!formData.nights) {
+      Swal.fire("Error", "Please enter the number of nights first.", "error");
+      return;
+    }
+    const key = formData.nights.toString();
+    const newOption = { ...nightsOptionForm };
+    if (!newOption.option || !newOption.add_price || !newOption.old_add_price) {
+      Swal.fire("Error", "Please fill in all fields for the nights option.", "error");
+      return;
+    }
+    setFormData((prevData) => {
+      const currentOptions = prevData.nightsOptions[key] || [];
+      return {
+        ...prevData,
+        nightsOptions: {
+          ...prevData.nightsOptions,
+          [key]: [...currentOptions, newOption],
+        },
+      };
+    });
+    // Reset the nights option form.
+    setNightsOptionForm({
+      option: "",
+      add_price: "",
+      old_add_price: ""
+    });
+  };
+
+  // Remove a nights option.
+  const removeNightsOption = (nightsKey, index) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      nightsOptions: {
+        ...prevData.nightsOptions,
+        [nightsKey]: prevData.nightsOptions[nightsKey].filter((_, i) => i !== index),
+      },
+    }));
+  };
+
+  // Validate all required fields.
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
@@ -199,22 +420,30 @@ const TourForm = () => {
       newErrors.tour_image = "At least one tour image is required.";
       isValid = false;
     }
-
-    // Check itinerary for each day
-    Object.keys(formData.itinerary).forEach((dayKey) => {
-      if (!formData.itinerary[dayKey]) {
-        newErrors[dayKey] = "Activities for this day are required.";
-        isValid = false;
-      }
-      if (!formData.itineraryTitles[dayKey]) {
-        newErrors[`${dayKey}_title`] = "Title for this day is required.";
-        isValid = false;
-      }
-      if (formData.itineraryImages[dayKey].length === 0) {
-        newErrors[`${dayKey}_images`] = "At least one image is required.";
+    // Validate itinerary: arrival and departure are required.
+    if (!formData.itinerary.first_day) {
+      newErrors.first_day = "Arrival day itinerary is required.";
+      isValid = false;
+    }
+    if (!formData.itinerary.last_day) {
+      newErrors.last_day = "Departure day itinerary is required.";
+      isValid = false;
+    }
+    Object.keys(formData.itinerary.middle_days).forEach((dayKey) => {
+      if (!formData.itinerary.middle_days[dayKey]) {
+        newErrors[dayKey] = `Itinerary for ${dayKey} is required.`;
         isValid = false;
       }
     });
+    // Validate nights options: at least one option must be added.
+    if (
+      formData.nights &&
+      (!formData.nightsOptions[formData.nights.toString()] ||
+        formData.nightsOptions[formData.nights.toString()].length === 0)
+    ) {
+      newErrors.nightsOptions = "Please add at least one nights option.";
+      isValid = false;
+    }
 
     setErrors(newErrors);
     return isValid;
@@ -223,8 +452,8 @@ const TourForm = () => {
   const handleSubmitItinerary = () => {
     if (validateForm()) {
       setShowItinerary(true);
-      setIsItinerarySubmitted(true); // Set itinerary as submitted
-      Swal.fire("Itinerary Submitted!", "Only the itinerary section is displayed.", "success");
+      setIsItinerarySubmitted(true);
+      Swal.fire("Itinerary Submitted!", "Itinerary section submitted successfully.", "success");
     } else {
       Swal.fire("Error", "Please fill out all required fields.", "error");
     }
@@ -238,51 +467,56 @@ const TourForm = () => {
       expiry_date: "",
       valid_from: "",
       valid_to: "",
-      food_category: "",
+      food_category: {
+        0: [0, 0],
+        1: [0, 0],
+        2: [0, 0],
+      },
       country: "",
       markets: [],
-      itinerary: {},
-      itineraryImages: {},
-      itineraryTitles: {},
+      tour_summary: "",
+      oldPrice: "",
+      inclusions: "",
+      exclusions: "",
+      facilities: "",
       tour_image: [],
       destination_images: [],
       activity_images: [],
       hotel_images: [],
-      inclusions: "",
-      exclusions: "",
-      tour_summary: "",
-      oldPrice: "",
+      itinerary: {
+        first_day: "",
+        middle_days: {},
+        last_day: "",
+      },
+      itineraryImages: {
+        first_day: [],
+        middle_days: {},
+        last_day: [],
+      },
+      itineraryTitles: {
+        first_day: "",
+        middle_days: {},
+        last_day: "",
+      },
+      nightsOptions: {},
     });
     setShowItinerary(false);
-    setShowRestItinerary(false);
     setErrors({});
-    setIsItinerarySubmitted(false); 
-  };
-
-  const handleShowRestItinerary = () => {
-    setShowRestItinerary((prevState) => !prevState);
+    setIsItinerarySubmitted(false);
   };
 
   const handleSubmitTour = async () => {
-    const isValid = validateForm();
-    if (isValid) {
+    if (validateForm()) {
       try {
-        // Transform itinerary: split each day's activities into an array of strings
-        const itineraryTransformed = Object.fromEntries(
-          Object.entries(formData.itinerary).map(([day, activities]) => [
-            day,
-            activities.split('\n').filter(activity => activity.trim() !== '')
-          ])
-        );
-
         const payload = {
           title: formData.title,
-          price: Number(formData.price),
-          nights: Number(formData.nights),
+          price: formData.price,
+          // The nights field now contains the nights options object.
+          nights: formData.nightsOptions,
           expiry_date: formData.expiry_date,
           valid_from: formData.valid_from,
           valid_to: formData.valid_to,
-          food_category: formData.food,
+          food_category: formData.food_category,
           country: formData.country,
           markets: formData.markets,
           tour_summary: formData.tour_summary,
@@ -290,25 +524,31 @@ const TourForm = () => {
           destination_images: formData.destination_images,
           activity_images: formData.activity_images,
           hotel_images: formData.hotel_images,
-          inclusions: formData.inclusions.split('\n').filter(item => item.trim() !== ''),
-          exclusions: formData.exclusions.split('\n').filter(item => item.trim() !== ''),
-          itinerary: itineraryTransformed,
+          inclusions: formData.inclusions.split("\n"),
+          exclusions: formData.exclusions.split("\n"),
+          facilities: formData.facilities.split("\n"),
+          itinerary: formData.itinerary,
           itinerary_images: formData.itineraryImages,
           itinerary_titles: formData.itineraryTitles,
           oldPrice: formData.oldPrice,
         };
 
-        console.log("Payload:", JSON.stringify(payload));
-
-        const response = await axios.post("/tours", payload, {
+        const response = await fetch("/tours", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          withCredentials: true,
+          body: JSON.stringify(payload),
         });
 
-        Swal.fire("Success!", "Tour has been created successfully.", "success");
-        handleResetItinerary();
+        if (response.ok) {
+          Swal.fire("Success!", "Tour has been created successfully.", "success");
+          handleResetItinerary();
+        } else {
+          const errorData = await response.json();
+          console.error("Response error:", errorData);
+          throw new Error(errorData.message || "Failed to create the tour.");
+        }
       } catch (error) {
         console.error("Error:", error);
         Swal.fire("Error", error.message, "error");
@@ -349,65 +589,92 @@ const TourForm = () => {
           {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
         </div>
 
-        <div>
-          <label className="block text-lg font-medium">Expiry Date</label>
-          <input
-            type="date"
-            name="expiry_date"
-            value={formData.expiry_date}
-            onChange={handleInputChange}
-            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-          />
-          {errors.expiry_date && <p className="text-red-500 text-sm">{errors.expiry_date}</p>}
-        </div>
-
-        
-        <div>
-          <label className="block text-lg font-medium">Valid From</label>
-          <input
-            type="date"
-            name="valid_from"
-            value={formData.valid_from}
-            onChange={handleInputChange}
-            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-          />
-          {errors.valid_from && <p className="text-red-500 text-sm">{errors.valid_from}</p>}
-        </div>
-
-        <div>
-          <label className="block text-lg font-medium">Valid To</label>
-          <input
-            type="date"
-            name="valid_to"
-            value={formData.valid_to}
-            onChange={handleInputChange}
-            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-          />
-          {errors.valid_to && <p className="text-red-500 text-sm">{errors.valid_to}</p>}
-        </div>
-
-        <div>
-          <label className="block text-lg font-medium">Food Category</label>
-          <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
-            {Object.entries(foodCategoryMapping).map(([key, value]) => (
-              <div key={key} className="flex items-center space-x-4">
-                <input
-                  type="radio"
-                  name="food_category"
-                  value={key}
-                  checked={formData.food_category === key}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    setFormData((prevData) => ({
-                      ...prevData,
-                      food_category: value,
-                    }));
-                  }}
-                />
-                <label>{value}</label>
-              </div>
-            ))}
+        <div className="grid grid-cols-3 gap-4">
+          {/* Expiry Date */}
+          <div>
+            <label className="block text-lg font-medium">Expiry Date</label>
+            <input
+              type="date"
+              name="expiry_date"
+              value={formData.expiry_date}
+              onChange={handleInputChange}
+              className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+            />
           </div>
+
+          {/* Valid From */}
+          <div>
+            <label className="block text-lg font-medium">Valid From</label>
+            <input
+              type="date"
+              name="valid_from"
+              value={formData.valid_from}
+              onChange={handleInputChange}
+              className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+            />
+          </div>
+
+          {/* Valid To */}
+          <div>
+            <label className="block text-lg font-medium">Valid To</label>
+            <input
+              type="date"
+              name="valid_to"
+              value={formData.valid_to}
+              onChange={handleInputChange}
+              className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+            />
+          </div>
+        </div>
+        
+        {/* Food Category Pricing */}
+        <div>
+          <label className="block text-lg font-medium">Food Category Pricing</label>
+          {Object.entries(foodCategoryMapping).map(([key, label]) => (
+            <div key={key} className="border p-4 rounded-md my-2">
+              <h4 className="font-bold">{label}</h4>
+              <div className="flex space-x-4 mt-2">
+                <div>
+                  <label className="block text-sm">Add Price</label>
+                  <input
+                    type="number"
+                    name={`food_category_${key}_add_price`}
+                    // //// CHANGED: Access first element of the array instead of object property.
+                    value={formData.food_category[key]?.[0] || ""}
+                    onChange={(e) =>
+                      handleFoodCategoryChange(key, 0, e.target.value)
+                    }
+                    className="p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm">Old Add Price</label>
+                  <input
+                    type="number"
+                    name={`food_category_${key}_old_add_price`}
+                    // //// CHANGED: Access second element of the array instead of object property.
+                    value={formData.food_category[key]?.[1] || ""}
+                    onChange={(e) =>
+                      handleFoodCategoryChange(key, 1, e.target.value)
+                    }
+                    className="p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Country */}
+        <div>
+          <label className="block text-lg font-medium">Country</label>
+          <textarea
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+            placeholder="Country"
+          />
         </div>
 
         {/* Markets */}
@@ -422,13 +689,12 @@ const TourForm = () => {
                   value={key}
                   checked={formData.markets.includes(Number(key))}
                   onChange={(e) => {
-                    const { checked, value } = e.target;
-                    const numericValue = Number(value);
+                    const numericValue = Number(e.target.value);
                     setFormData((prevData) => ({
                       ...prevData,
-                      markets: checked
+                      markets: e.target.checked
                         ? [...prevData.markets, numericValue]
-                        : prevData.markets.filter((market) => market !== numericValue),
+                        : prevData.markets.filter((m) => m !== numericValue),
                     }));
                   }}
                 />
@@ -436,18 +702,6 @@ const TourForm = () => {
               </div>
             ))}
           </div>
-        </div>
-
-        <div>
-          <label className="block text-lg font-medium">Country</label>
-          <textarea
-            name="country"
-            value={formData.country}
-            onChange={handleInputChange}
-            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="Country"
-          />
-          {errors.country && <p className="text-red-500 text-sm">{errors.country}</p>}
         </div>
 
         {/* Tour Summary */}
@@ -469,7 +723,7 @@ const TourForm = () => {
           <input
             type="file"
             multiple
-            onChange={(e) => handleImageUpload(e, "tour_image")}
+            onChange={(e) => handleImageUpload(e, "tour_image", "tour_image")}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
           />
           <div className="flex space-x-2 mt-4">
@@ -482,7 +736,12 @@ const TourForm = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => handleRemoveImage("tour_image", index)}
+                  onClick={() =>
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      tour_image: prevData.tour_image.filter((_, i) => i !== index),
+                    }))
+                  }
                   className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                 >
                   <FaTrash />
@@ -498,7 +757,7 @@ const TourForm = () => {
           <input
             type="file"
             multiple
-            onChange={(e) => handleImageUpload(e, "destination_images")}
+            onChange={(e) => handleImageUpload(e, "destination_images", "destination_images")}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
           />
           <div className="flex space-x-2 mt-4">
@@ -511,7 +770,12 @@ const TourForm = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => handleRemoveImage("destination_images", index)}
+                  onClick={() =>
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      destination_images: prevData.destination_images.filter((_, i) => i !== index),
+                    }))
+                  }
                   className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                 >
                   <FaTrash />
@@ -527,7 +791,7 @@ const TourForm = () => {
           <input
             type="file"
             multiple
-            onChange={(e) => handleImageUpload(e, "activity_images")}
+            onChange={(e) => handleImageUpload(e, "activity_images", "activity_images")}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
           />
           <div className="flex space-x-2 mt-4">
@@ -540,7 +804,12 @@ const TourForm = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => handleRemoveImage("activity_images", index)}
+                  onClick={() =>
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      activity_images: prevData.activity_images.filter((_, i) => i !== index),
+                    }))
+                  }
                   className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                 >
                   <FaTrash />
@@ -556,7 +825,7 @@ const TourForm = () => {
           <input
             type="file"
             multiple
-            onChange={(e) => handleImageUpload(e, "hotel_images")}
+            onChange={(e) => handleImageUpload(e, "hotel_images", "hotel_images")}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
           />
           <div className="flex space-x-2 mt-4">
@@ -569,7 +838,12 @@ const TourForm = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => handleRemoveImage("hotel_images", index)}
+                  onClick={() =>
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      hotel_images: prevData.hotel_images.filter((_, i) => i !== index),
+                    }))
+                  }
                   className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                 >
                   <FaTrash />
@@ -597,76 +871,241 @@ const TourForm = () => {
           </p>
         </div>
 
+        {/* Nights Options Section */}
+        <div className="border p-4 rounded-md bg-gray-50">
+          <h3 className="text-xl font-bold mb-4">Nights Options (Add-on Pricing)</h3>
+          {errors.nightsOptions && <p className="text-red-500 text-sm">{errors.nightsOptions}</p>}
+          {formData.nights ? (
+            <div>
+              <p className="mb-2">Adding options for {formData.nights} nights:</p>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="flex flex-col space-y-2">
+                  <input
+                    type="text"
+                    name="option"
+                    value={nightsOptionForm.option}
+                    onChange={handleNightsOptionInputChange}
+                    placeholder="Option description"
+                    className="p-2 border border-gray-300 rounded-md"
+                  />
+                  <input
+                    type="number"
+                    name="add_price"
+                    value={nightsOptionForm.add_price}
+                    onChange={handleNightsOptionInputChange}
+                    placeholder="Add Price"
+                    className="p-2 border border-gray-300 rounded-md"
+                  />
+                  <input
+                    type="number"
+                    name="old_add_price"
+                    value={nightsOptionForm.old_add_price}
+                    onChange={handleNightsOptionInputChange}
+                    placeholder="Old Add Price"
+                    className="p-2 border border-gray-300 rounded-md"
+                  />
+                  <button onClick={addNightsOption} className="bg-blue-500 text-white px-4 py-2 rounded-md">
+                    Add Option
+                  </button>
+                </div>
+              </div>
+              {formData.nightsOptions[formData.nights.toString()] && (
+                <div className="mt-4">
+                  <h4 className="font-bold">Current Options:</h4>
+                  <ul>
+                    {formData.nightsOptions[formData.nights.toString()].map((opt, idx) => (
+                      <li key={idx} className="flex justify-between items-center border p-2 rounded-md my-1">
+                        <span>
+                          {opt.option} - Add Price: {opt.add_price}, Old Add Price: {opt.old_add_price}
+                        </span>
+                        <button onClick={() => removeNightsOption(formData.nights.toString(), idx)} className="bg-red-500 text-white px-2 py-1 rounded">
+                          <FaTrash />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p>Please enter the number of nights above to add options.</p>
+          )}
+        </div>
+
+        {/* Facilities */}
+        <div>
+          <label className="block text-lg font-medium">Facilities</label>
+          <textarea
+            name="facilities"
+            value={formData.facilities}
+            onChange={handleInputChange}
+            className="mt-0 p-2 w-full border border-gray-300 rounded-md"
+            placeholder="Enter facilities, one per line"
+          />
+        </div>
+
         {/* Itinerary Section */}
         {!showItinerary ? (
           <div>
             <label className="block text-lg font-medium">Itinerary</label>
             <div className="space-y-6">
-              {Object.keys(formData.itinerary).map((dayKey, index) => (
-                <div key={index} className="space-y-4 border p-4 rounded-md bg-blue-100">
-                  <span className="bg-blue-500 text-white px-6 py-2 rounded-lg">
-                    {`Day ${index + 1}`}
-                  </span>
-
-                  <div>
-                    <input
-                      type="text"
-                      onChange={(e) => handleItineraryTitleChange(e, dayKey)}
-                      className="p-2 w-full border border-gray-300 rounded-md"
-                      placeholder={`Title for ${dayKey}`}
-                    />
-                  </div>
-
-                  <textarea
-                    rows="2"
-                    placeholder={`Activities for ${dayKey} (use ENTER for each activity)`}
-                    value={formData.itinerary[dayKey]}
-                    onChange={(e) => handleItineraryChange(e, dayKey)}
+              {/* Arrival Day */}
+              <div className="border p-4 rounded-md bg-blue-100">
+                <span className="bg-blue-500 text-white px-6 py-2 rounded-lg">Arrival Day</span>
+                <div>
+                  <input
+                    type="text"
+                    value={formData.itineraryTitles.first_day}
+                    onChange={(e) => handleItineraryTitleChange(e, "first_day")}
+                    placeholder="Title for Arrival Day"
                     className="p-2 w-full border border-gray-300 rounded-md"
                   />
-
-                  <div className="space-x-2 mt-4">
-                    <input
-                      type="file"
-                      onChange={(e) => handleImageUpload(e, "", dayKey)}
-                      multiple
-                      className="p-2 w-full border border-gray-300 rounded-md"
-                    />
-                    <div className="flex space-x-2 mt-4">
-                      {formData.itineraryImages[dayKey].map((image, idx) => (
-                        <div key={idx} className="relative">
-                          <img
-                            src={image}
-                            alt={`Day ${index + 1} Image ${idx}`}
-                            className="w-24 h-24 object-cover rounded"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage("", idx, dayKey)}
-                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                </div>
+                <textarea
+                  rows="2"
+                  placeholder="Activities for Arrival Day (use ENTER for each activity)"
+                  value={formData.itinerary.first_day}
+                  onChange={(e) => handleItineraryChange(e, "first_day")}
+                  className="p-2 w-full border border-gray-300 rounded-md"
+                />
+                <div className="space-x-2 mt-4">
+                  <input
+                    type="file"
+                    onChange={(e) => handleImageUpload(e, "first_day", "first_day")}
+                    multiple
+                    className="p-2 w-full border border-gray-300 rounded-md"
+                  />
+                  <div className="flex space-x-2 mt-4">
+                    {formData.itineraryImages.first_day.map((image, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={image}
+                          alt={`Arrival Day Image ${index}`}
+                          className="w-24 h-24 object-cover rounded"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage("first_day", index)}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Middle Days */}
+              {Object.keys(formData.itinerary.middle_days).length > 0 && (
+                <div>
+                  <h3 className="text-2xl font-bold">Middle Days</h3>
+                  {Object.keys(formData.itinerary.middle_days).map((dayKey) => (
+                    <div key={dayKey} className="border p-4 rounded-md bg-blue-100 my-4">
+                      <span className="bg-blue-500 text-white px-6 py-2 rounded-lg">
+                        {`Day ${dayKey.split("_")[1]}`}
+                      </span>
+                      <div>
+                        <input
+                          type="text"
+                          value={formData.itineraryTitles.middle_days[dayKey]}
+                          onChange={(e) => handleItineraryTitleChange(e, "middle_days", dayKey)}
+                          placeholder={`Title for Day ${dayKey.split("_")[1]}`}
+                          className="p-2 w-full border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <textarea
+                        rows="2"
+                        placeholder={`Activities for Day ${dayKey.split("_")[1]} (use ENTER for each activity)`}
+                        value={formData.itinerary.middle_days[dayKey]}
+                        onChange={(e) => handleItineraryChange(e, "middle_days", dayKey)}
+                        className="p-2 w-full border border-gray-300 rounded-md"
+                      />
+                      <div className="space-x-2 mt-4">
+                        <input
+                          type="file"
+                          onChange={(e) => handleImageUpload(e, dayKey, "middle_days")}
+                          multiple
+                          className="p-2 w-full border border-gray-300 rounded-md"
+                        />
+                        <div className="flex space-x-2 mt-4">
+                          {formData.itineraryImages.middle_days[dayKey]?.map((image, idx) => (
+                            <div key={idx} className="relative">
+                              <img
+                                src={image}
+                                alt={`Day ${dayKey.split("_")[1]} Image ${idx}`}
+                                className="w-24 h-24 object-cover rounded"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveImage(dayKey, idx, "middle_days")}
+                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Departure Day */}
+              <div className="border p-4 rounded-md bg-blue-100">
+                <span className="bg-blue-500 text-white px-6 py-2 rounded-lg">Departure Day</span>
+                <div>
+                  <input
+                    type="text"
+                    value={formData.itineraryTitles.last_day}
+                    onChange={(e) => handleItineraryTitleChange(e, "last_day")}
+                    placeholder="Title for Departure Day"
+                    className="p-2 w-full border border-gray-300 rounded-md"
+                  />
+                </div>
+                <textarea
+                  rows="2"
+                  placeholder="Activities for Departure Day (use ENTER for each activity)"
+                  value={formData.itinerary.last_day}
+                  onChange={(e) => handleItineraryChange(e, "last_day")}
+                  className="p-2 w-full border border-gray-300 rounded-md"
+                />
+                <div className="space-x-2 mt-4">
+                  <input
+                    type="file"
+                    onChange={(e) => handleImageUpload(e, "last_day", "last_day")}
+                    multiple
+                    className="p-2 w-full border border-gray-300 rounded-md"
+                  />
+                  <div className="flex space-x-2 mt-4">
+                    {formData.itineraryImages.last_day.map((image, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={image}
+                          alt={`Departure Day Image ${index}`}
+                          className="w-24 h-24 object-cover rounded"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage("last_day", index)}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Submit and Reset Buttons */}
+            {/* Itinerary Submit and Reset */}
             <div className="flex justify-between mt-4">
-              <button
-                onClick={handleSubmitItinerary}
-                className="bg-blue-500 text-white px-6 py-2 rounded-lg"
-              >
+              <button onClick={handleSubmitItinerary} className="bg-blue-500 text-white px-6 py-2 rounded-lg">
                 Submit Itinerary
               </button>
-              <button
-                onClick={handleResetItinerary}
-                className="bg-gray-500 text-white px-6 py-2 rounded-lg"
-              >
+              <button onClick={handleResetItinerary} className="bg-gray-500 text-white px-6 py-2 rounded-lg">
                 Reset
               </button>
             </div>
@@ -675,23 +1114,41 @@ const TourForm = () => {
           <div>
             <h3 className="text-xl font-bold text-center mt-6">Itinerary Details</h3>
             <div className="space-y-6">
-              {Object.keys(formData.itinerary).map((dayKey, index) => (
-                <div key={index} className="space-y-4 border p-4 rounded-md bg-blue-100">
-                  <h4 className="bg-blue-500 text-white px-6 py-2 rounded-lg">{`Day ${index + 1}`}</h4>
-                  <p className="font-bold">{formData.itineraryTitles[dayKey]}</p>
-                  <p>{formData.itinerary[dayKey]}</p>
+              {/* Display Arrival Day */}
+              <div className="border p-4 rounded-md bg-blue-100">
+                <h4 className="bg-blue-500 text-white px-6 py-2 rounded-lg">Arrival Day</h4>
+                <p className="font-bold">{formData.itineraryTitles.first_day}</p>
+                <p>{formData.itinerary.first_day}</p>
+                <div className="flex space-x-2">
+                  {formData.itineraryImages.first_day.map((image, index) => (
+                    <img key={index} src={image} alt={`Arrival Day Image ${index}`} className="w-24 h-24 object-cover rounded" />
+                  ))}
+                </div>
+              </div>
+              {/* Display Middle Days */}
+              {Object.keys(formData.itinerary.middle_days).map((dayKey) => (
+                <div key={dayKey} className="border p-4 rounded-md bg-blue-100">
+                  <h4 className="bg-blue-500 text-white px-6 py-2 rounded-lg">{`Day ${dayKey.split("_")[1]}`}</h4>
+                  <p className="font-bold">{formData.itineraryTitles.middle_days[dayKey]}</p>
+                  <p>{formData.itinerary.middle_days[dayKey]}</p>
                   <div className="flex space-x-2">
-                    {formData.itineraryImages[dayKey]?.map((image, idx) => (
-                      <img
-                        key={idx}
-                        src={image}
-                        alt={`Day ${index + 1} Image ${idx}`}
-                        className="w-24 h-24 object-cover rounded"
-                      />
+                    {formData.itineraryImages.middle_days[dayKey]?.map((image, idx) => (
+                      <img key={idx} src={image} alt={`Day ${dayKey.split("_")[1]} Image ${idx}`} className="w-24 h-24 object-cover rounded" />
                     ))}
                   </div>
                 </div>
               ))}
+              {/* Display Departure Day */}
+              <div className="border p-4 rounded-md bg-blue-100">
+                <h4 className="bg-blue-500 text-white px-6 py-2 rounded-lg">Departure Day</h4>
+                <p className="font-bold">{formData.itineraryTitles.last_day}</p>
+                <p>{formData.itinerary.last_day}</p>
+                <div className="flex space-x-2">
+                  {formData.itineraryImages.last_day.map((image, index) => (
+                    <img key={index} src={image} alt={`Departure Day Image ${index}`} className="w-24 h-24 object-cover rounded" />
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Show Reset button after itinerary has been submitted */}
@@ -714,7 +1171,7 @@ const TourForm = () => {
             value={formData.inclusions}
             onChange={handleInputChange}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="List of inclusions (one per line)"
+            placeholder="List of inclusions (ENTER for each item)"
           />
         </div>
 
@@ -726,7 +1183,7 @@ const TourForm = () => {
             value={formData.exclusions}
             onChange={handleInputChange}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="List of exclusions (one per line)"
+            placeholder="List of exclusions (ENTER for each item)"
           />
         </div>
 

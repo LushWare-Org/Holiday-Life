@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, message, Space, Card, Divider } from 'antd';
+import { Table, Button, Modal, Form, Input, message, Space, Card, Divider, Row, Col } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
@@ -27,6 +27,14 @@ function useDeviceType() {
   return deviceType;
 }
 
+const convertToUSD = (price, currency, rates) => {
+  if (currency === 'USD') return price;
+  const rate = rates[currency];
+  if (!rate) return price; // Fallback if rate not available
+  // If rate is the amount of currency per 1 USD, then to convert price in that currency to USD:
+  return price / rate;
+};
+
 /**
  * TourInquiries component: Fetches and displays inquiries in both
  * a table (desktop) and card (mobile/tablet) view. Allows replying
@@ -44,8 +52,20 @@ const TourInquiries = () => {
   const { isMobile, isTablet } = useDeviceType();
   const isDesktop = !isMobile && !isTablet;
 
+  const [exchangeRates, setExchangeRates] = useState({});
+
+  const fetchExchangeRates = async () => {
+    try {
+      const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
+      setExchangeRates(response.data.rates);
+    } catch (error) {
+      console.error('Error fetching exchange rates:', error);
+    }
+  };
+
   useEffect(() => {
     fetchInquiries();
+    fetchExchangeRates();
   }, []);
 
   // Fetch inquiries from the backend
@@ -155,33 +175,6 @@ const TourInquiries = () => {
       align: 'center',
     },
     {
-      title: 'Phone Number',
-      dataIndex: 'phone_number',
-      key: 'phone_number',
-      align: 'center',
-      render: (phone) => phone || 'N/A',
-    },
-    {
-      title: 'Travel Date',
-      dataIndex: 'travel_date',
-      key: 'travel_date',
-      align: 'center',
-      render: (date) => (date ? date.toLocaleDateString() : 'N/A'),
-    },
-    {
-      title: 'Traveller Count',
-      dataIndex: 'traveller_count',
-      key: 'traveller_count',
-      align: 'center',
-      render: (count) => count || 'N/A',
-    },
-    {
-      title: 'Message',
-      dataIndex: 'message',
-      key: 'message',
-      align: 'center',
-    },
-    {
       title: 'Actions',
       key: 'actions',
       align: 'center',
@@ -226,6 +219,41 @@ const TourInquiries = () => {
     },
   ];
 
+  // Provide a row expansion with all the other details and show final price converted to USD when needed.
+  const expandedRowRender = (record) => {
+    const formattedDate = record.travel_date
+      ? record.travel_date.toLocaleDateString()
+      : 'N/A';
+    const finalPriceInUSD =
+      record.final_price && record.currency !== 'USD'
+        ? convertToUSD(record.final_price, record.currency, exchangeRates)
+        : record.final_price;
+    return (
+      <div style={{ backgroundColor: '#fafafa', padding: '16px' }}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={8}>
+            <p><strong>Phone Number:</strong> {record.phone_number || 'N/A'}</p>
+            <p><strong>Travel Date:</strong> {formattedDate}</p>
+            <p><strong>Traveller Count:</strong> {record.traveller_count || 'N/A'}</p>
+            <p><strong>Message:</strong> {record.message || 'N/A'}</p>
+          </Col>
+          <Col xs={24} sm={24} md={8}>
+            <p><strong>Tour:</strong> {record.tour || 'N/A'}</p>
+            <p><strong>Selected Nights:</strong> {record.selected_nights_key || 'N/A'} Nights</p>
+            <p><strong>Option:</strong> {record.selected_nights_option || 'N/A'}</p>
+            <p><strong>Food:</strong> {record.selected_food_category || 'N/A'}</p>
+            <p>
+              <strong>Final Price:</strong> USD{' '}
+              {finalPriceInUSD !== undefined
+                ? finalPriceInUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                : '0'}
+            </p>
+          </Col>
+        </Row>
+      </div>
+    );
+  };
+
   /**
    * Render mobile/tablet cards instead of a table.
    */
@@ -246,6 +274,11 @@ const TourInquiries = () => {
             ? inquiry.travel_date.toLocaleDateString()
             : 'N/A';
 
+            const finalPriceInUSD =
+            inquiry.final_price && inquiry.currency !== 'USD'
+              ? convertToUSD(inquiry.final_price, inquiry.currency, exchangeRates)
+              : inquiry.final_price;
+
           return (
             <Card
               key={inquiry._id}
@@ -260,9 +293,22 @@ const TourInquiries = () => {
               )}
             >
               <Divider style={{ margin: '12px 0' }} />
+              <p><strong>Phone:</strong> {inquiry.phone_number || 'N/A'}</p>
               <p><strong>Travel Date:</strong> {formattedTravelDate}</p>
               <p><strong>Traveller Count:</strong> {inquiry.traveller_count || 'N/A'}</p>
               <p><strong>Message:</strong> {inquiry.message}</p>
+
+              <Divider />
+              <p><strong>Tour:</strong> {inquiry.tour || 'N/A'}</p>
+              <p><strong>Nights:</strong> {inquiry.selected_nights_key || 'N/A'}</p>
+              <p><strong>Option:</strong> {inquiry.selected_nights_option || 'N/A'}</p>
+              <p><strong>Food:</strong> {inquiry.selected_food_category || 'N/A'}</p>
+              <p>
+                <strong>Final Price:</strong> USD{' '}
+                {finalPriceInUSD !== undefined
+                  ? finalPriceInUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                  : '0'}
+              </p>
 
               <Divider />
 
@@ -317,6 +363,10 @@ const TourInquiries = () => {
           rowKey="_id"
           loading={loading}
           pagination={{ pageSize: 6 }}
+          expandable={{
+            expandedRowRender: (record) => expandedRowRender(record),
+            rowExpandable: (record) => true,
+          }}
         />
       ) : (
         // MOBILE/TABLET VIEW: show Card layout
