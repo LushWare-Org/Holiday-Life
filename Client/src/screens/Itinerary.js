@@ -131,7 +131,7 @@ const Itinerary = ({selectedNightsKey}) => {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [tourData]);
+  }, [tourData, itineraryDays]);
 
   if (loading) {
     return <div>Loading tour details...</div>;
