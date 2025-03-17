@@ -16,7 +16,6 @@ import HomeIcon from '@mui/icons-material/Home';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import { useNavigate } from 'react-router-dom';
-import { IconButton } from '@mui/material';
 import { FaTiktok, FaVk } from 'react-icons/fa';
 
 const center = {
