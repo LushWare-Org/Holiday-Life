@@ -1,14 +1,12 @@
 import React, { use, useEffect, useState } from 'react';
 import {
   AppBar,
-  Toolbar,
   Typography,
   Container,
   Grid,
   Button,
   IconButton,
   Box,
-  useMediaQuery
 } from '@mui/material';
 import { Facebook, Instagram } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
@@ -254,7 +252,7 @@ const Footer = () => {
                 <IconButton href="https://www.instagram.com" target="_blank" style={{ color: '#fff' }}>
                   <Instagram fontSize="large" />
                 </IconButton>
-                <IconButton href="https://www.facebook.com" target="_blank" style={{ color: '#fff' }}>
+                <IconButton href="https://www.facebook.com/share/1F7uxkppRf/" target="_blank" style={{ color: '#fff' }}>
                   <Facebook fontSize="large" />
                 </IconButton>
                 <IconButton href="https://www.tiktok.com" target="_blank" style={{ color: '#fff' }}>

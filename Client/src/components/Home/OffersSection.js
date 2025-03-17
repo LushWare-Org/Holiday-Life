@@ -5,7 +5,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import './OffersSection.css';
-
+import { useNavigate } from 'react-router-dom';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -63,6 +63,12 @@ const offers = [
 
 const OffersSection = () => {
   const isMobile = useIsMobile()
+  const navigate = useNavigate();
+
+  const handleDiscoverMore = (title) => {
+    navigate('/tours', { state: { title } });
+  };
+
   return (
     <div className="offers-section-wrapper">
       <div className="offers-section">
@@ -84,17 +90,22 @@ const OffersSection = () => {
         >
           {offers.map((offer, index) => (
             <SwiperSlide key={index}>
-              <a href={offer.link} className="offer-link" title={offer.title}>
-                <div className="offer-image">
-                  <img src={offer.imageUrl} alt={offer.title} className="offer-img" />
-                </div>
-                <div className="offer-text">
-                  <h3 className="offer-title">{offer.title}</h3>
-                  <p className="offer-description">{offer.description}</p>
-                  <a href={offer.link} className="offer-btn">Discover Tours</a>
-                </div>
-              </a>
-            </SwiperSlide>
+            <div className="offer-card">
+              <div className="offer-image">
+                <img src={offer.imageUrl} alt={offer.title} className="offer-img" />
+              </div>
+              <div className="offer-text">
+                <h3 className="offer-title">{offer.title}</h3>
+                <p className="offer-description">{offer.description}</p>
+                <button 
+                  className="offer-btn"
+                  onClick={() => handleDiscoverMore(offer.title)}
+                >
+                  Discover More
+                </button>
+              </div>
+            </div>
+          </SwiperSlide>
           ))}
         </Swiper>
       </div>

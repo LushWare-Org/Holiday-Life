@@ -8,14 +8,11 @@ import {
   Drawer,
   List,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   IconButton,
   InputBase,
   Select,
   MenuItem,
-  useMediaQuery,
-  useTheme,
   Divider
 } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';

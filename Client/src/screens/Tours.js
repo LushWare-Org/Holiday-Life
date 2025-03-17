@@ -28,6 +28,7 @@ const Tours = () => {
   const { isMobile, isTablet } = useDeviceType();
   const { state } = useLocation(); 
   const searchTerm = state?.searchTerm || null
+  const titlePassed = state?.title || null;
 
   return (
     <div>
@@ -44,7 +45,7 @@ const Tours = () => {
           Our tour packages offer a seamless blend of luxury, adventure, and tranquility, making it the ultimate tropical escape. These packages typically include stays in overwater villas or beachfront resorts, where you can wake up to panoramic ocean views and enjoy private access to crystal-clear lagoons. Whether you're snorkeling amidst vibrant coral reefs, indulging in rejuvenating spa treatments, or savoring gourmet meals at underwater restaurants, every moment is designed for unforgettable memories. With options like sunset cruises, island-hopping excursions, and water sports, Maldives tour packages cater to honeymooners, families, and solo travelers alike, ensuring a stress-free journey in paradise.
         </Typography>
         <br />
-        <ImageGallery searchQuery={searchTerm} />
+        <ImageGallery searchQuery={searchTerm} passedCountry={titlePassed} />
       </Box><br /><br />
       <Footer />
     </div>
