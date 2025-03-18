@@ -27,7 +27,7 @@ const AllTours = () => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
-    // 'nightsOptions' is the entire 'nights' object from DB
+    nights: "", 
     nightsOptions: {},
     expiry_date: "",
     valid_from: "",
@@ -69,8 +69,9 @@ const AllTours = () => {
     },
   });
 
-  // For adding new nights options to an existing nightsKey
-  // e.g. newNightsOptions["4"] = { option: "...", add_price: "...", old_add_price: "..." }
+  // nightsInput holds the user-entered (but not yet confirmed) nights count.
+  const [nightsInput, setNightsInput] = useState("");
+
   const [newNightsOptions, setNewNightsOptions] = useState({});
 
   useEffect(() => {
@@ -96,6 +97,51 @@ const AllTours = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const handleConfirmNights = () => {
+    const newNights = parseInt(nightsInput, 10);
+    if (isNaN(newNights) || newNights <= 0) {
+      Swal.fire("Error", "Please enter a valid number of nights", "error");
+      return;
+    }
+
+    // Get current maximum day number from existing middle_days keys.
+    const middleDays = formData.itinerary.middle_days || {};
+    const middleKeys = Object.keys(middleDays)
+      .map((key) => parseInt(key.split("_")[1], 10))
+      .filter((num) => !isNaN(num));
+    const currentMax = middleKeys.length > 0 ? Math.max(...middleKeys) : 1;
+
+    let newItinerary = { ...formData.itinerary };
+    let newItineraryImages = { ...formData.itineraryImages };
+    let newItineraryTitles = { ...formData.itineraryTitles };
+
+    if (newNights > currentMax) {
+      for (let i = currentMax + 1; i <= newNights; i++) {
+        const key = `day_${i}`;
+        newItinerary.middle_days[key] = "";
+        newItineraryImages.middle_days[key] = [];
+        newItineraryTitles.middle_days[key] = `Day ${i} Title`;
+      }
+    }
+    // If newNights is lower than currentMax, we do not remove extra days (they remain in state).
+
+    // Ensure pricing group for newNights exists.
+    setFormData((prev) => ({
+      ...prev,
+      nights: nightsInput, // update confirmed base nights
+      itinerary: newItinerary,
+      itineraryImages: newItineraryImages,
+      itineraryTitles: newItineraryTitles,
+      nightsOptions: {
+        ...prev.nightsOptions,
+        [nightsInput]: prev.nightsOptions[nightsInput] || [],
+      },
+    }));
+    console.log("Confirmed nights count:", nightsInput);
+    console.log("New nights options:", formData.nightsOptions[nightsInput]);
+    Swal.fire("Success", "Night count confirmed", "success");
+  };
+
   // Open edit modal and load tour data into formData
   const handleEditOpen = (tour) => {
     setEditTour(tour);
@@ -118,9 +164,13 @@ const AllTours = () => {
       2: [0, 0],
     };
 
+    const nightsObject = tour.nights || {};
+    const baseNightsKey = Object.keys(nightsObject)[0] || "";
+
     setFormData({
       title: tour.title,
       price: tour.price,
+      nights: baseNightsKey,
       nightsOptions: tour.nights || {},
       expiry_date: formatDate(tour.expiry_date),
       valid_from: formatDate(tour.valid_from),
@@ -166,6 +216,7 @@ const AllTours = () => {
     });
 
     // Clear leftover data for adding new options
+    setNightsInput(baseNightsKey);
     setNewNightsOptions({});
   };
 
@@ -174,6 +225,7 @@ const AllTours = () => {
     setFormData({
       title: "",
       price: "",
+      nights: "",
       nightsOptions: {},
       expiry_date: "",
       valid_from: "",
@@ -198,7 +250,12 @@ const AllTours = () => {
       itineraryImages: { first_day: [], middle_days: {}, last_day: [] },
       itineraryTitles: { first_day: "", middle_days: {}, last_day: "" },
     });
+    setNightsInput("");
     setNewNightsOptions({});
+  };
+
+  const handleNightsInputChange = (e) => {
+    setNightsInput(e.target.value);
   };
 
   // ============ General Handlers =============
@@ -254,10 +311,29 @@ const AllTours = () => {
     }));
   };
 
+  // Delete an entire nights group.
+  const handleDeleteNightsGroup = (nightsKey) => {
+    setFormData((prev) => {
+      const updatedOptions = { ...prev.nightsOptions };
+      delete updatedOptions[nightsKey];
+      const newBase = prev.nights === nightsKey ? "" : prev.nights;
+      return {
+        ...prev,
+        nights: newBase,
+        nightsOptions: updatedOptions,
+      };
+    });
+  };
+
   // Adds a new option to an existing nightsKey
   const addNightsOption = (nightsKey) => {
     const newOption = newNightsOptions[nightsKey];
-    if (!newOption || !newOption.option || !newOption.add_price || !newOption.old_add_price) {
+    if (
+      !newOption ||
+      !newOption.option ||
+      !newOption.add_price ||
+      !newOption.old_add_price
+    ) {
       Swal.fire("Error", "Please fill in all fields for the nights option.", "error");
       return;
     }
@@ -468,6 +544,7 @@ const AllTours = () => {
       const payload = {
         title: formData.title,
         price: formData.price,
+        baseNights: parseInt(formData.nights, 10) || 0,
         nights: formData.nightsOptions,
         expiry_date: formData.expiry_date,
         valid_from: formData.valid_from,
@@ -836,89 +913,117 @@ const AllTours = () => {
                 </div>
               </div>
 
-              {/* Nights Options (Add-on Pricing) - Existing Keys */}
-              <div className="border p-4 rounded-md bg-gray-50">
-                <h3 className="text-xl font-bold mb-4">Nights Options (Add-on Pricing)</h3>
-                {Object.entries(formData.nightsOptions).map(([nightsKey, optionsArray]) => {
-                  // If optionsArray is an array, use it; if it’s an object, use its values.
-                  const safeArray = Array.isArray(optionsArray) ? optionsArray : Object.values(optionsArray);
-                  return (
-                    <div key={nightsKey} className="mb-4 border-b pb-4">
-                      <h4 className="font-semibold mb-2">{nightsKey} nights</h4>
-                      {safeArray.map((opt, idx) => (
-                        <div key={idx} className="flex justify-between items-center p-2 border-b">
-                          <p>
-                            {opt.option} 
-                            <br />
-                            <span className="text-gray-500">Additional Price: <span className="bg-gray-300/80 text-gray-600 p-1"> {opt.add_price} </span>, Old Additional Price:<span className="bg-gray-300/80 text-gray-600 p-1"> {opt.old_add_price}</span></span>
-                          </p>
-                          <button
-                            className="bg-red-500 text-white px-2 py-1 rounded"
-                            onClick={() => removeNightsOption(nightsKey, idx)}
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      ))}
-
-                      {/* Add new option to this nightsKey */}
-                      <div className="flex flex-wrap items-center space-x-2 mt-3">
-                        <input
-                          type="text"
-                          placeholder="Option description"
-                          value={newNightsOptions[nightsKey]?.option || ""}
-                          onChange={(e) =>
-                            setNewNightsOptions((prev) => ({
-                              ...prev,
-                              [nightsKey]: {
-                                ...prev[nightsKey],
-                                option: e.target.value,
-                              },
-                            }))
-                          }
-                          className="p-2 border border-gray-300 rounded w-1/3"
-                        />
-                        <input
-                          type="number"
-                          placeholder="Add Price"
-                          value={newNightsOptions[nightsKey]?.add_price || ""}
-                          onChange={(e) =>
-                            setNewNightsOptions((prev) => ({
-                              ...prev,
-                              [nightsKey]: {
-                                ...prev[nightsKey],
-                                add_price: e.target.value,
-                              },
-                            }))
-                          }
-                          className="p-2 border border-gray-300 rounded w-1/4"
-                        />
-                        <input
-                          type="number"
-                          placeholder="Old Add Price"
-                          value={newNightsOptions[nightsKey]?.old_add_price || ""}
-                          onChange={(e) =>
-                            setNewNightsOptions((prev) => ({
-                              ...prev,
-                              [nightsKey]: {
-                                ...prev[nightsKey],
-                                old_add_price: e.target.value,
-                              },
-                            }))
-                          }
-                          className="p-2 border border-gray-300 rounded w-1/4"
-                        />
-                        <button
-                          className="bg-blue-500 text-white px-3 py-1 rounded"
-                          onClick={() => addNightsOption(nightsKey)}
-                        >
-                          Add
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* --- Nights Input & Confirmation --- */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600">Number of Nights</label>
+                <div className="flex space-x-2">
+                  <input
+                    type="number"
+                    value={nightsInput}
+                    onChange={handleNightsInputChange}
+                    className="mt-1 p-2 flex-grow border border-gray-300 rounded-md"
+                    placeholder="Enter new night count"
+                  />
+                  <button
+                    onClick={handleConfirmNights}
+                    className="mt-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Confirm Nights
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Confirming will add new itinerary days (if higher) and create a pricing group.
+                </p>
               </div>
+
+              {/* --- Nights Options (Add-on Pricing) Section --- */}
+              {formData.nights && (
+                <div className="border p-4 rounded-md bg-gray-50">
+                  <h3 className="text-xl font-bold mb-4">
+                    Nights Options (Add-on Pricing) for {formData.nights} nights
+                  </h3>
+                  {(Array.isArray(formData.nightsOptions[formData.nights])
+                    ? formData.nightsOptions[formData.nights]
+                    : []
+                  ).map((opt, idx) => (
+                    <div key={idx} className="flex justify-between items-center p-2 border-b">
+                      <p>
+                        {opt.option}
+                        <br />
+                        <span className="text-gray-500">
+                          Additional Price:{" "}
+                          <span className="bg-gray-300/80 text-gray-600 p-1">
+                            {opt.add_price}
+                          </span>
+                          , Old Additional Price:{" "}
+                          <span className="bg-gray-300/80 text-gray-600 p-1">
+                            {opt.old_add_price}
+                          </span>
+                        </span>
+                      </p>
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 rounded"
+                        onClick={() => removeNightsOption(formData.nights, idx)}
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex flex-wrap items-center space-x-2 mt-3">
+                    <input
+                      type="text"
+                      placeholder="Option description"
+                      value={newNightsOptions[formData.nights]?.option || ""}
+                      onChange={(e) =>
+                        setNewNightsOptions((prev) => ({
+                          ...prev,
+                          [formData.nights]: {
+                            ...prev[formData.nights],
+                            option: e.target.value,
+                          },
+                        }))
+                      }
+                      className="p-2 border border-gray-300 rounded w-1/3"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Add Price"
+                      value={newNightsOptions[formData.nights]?.add_price || ""}
+                      onChange={(e) =>
+                        setNewNightsOptions((prev) => ({
+                          ...prev,
+                          [formData.nights]: {
+                            ...prev[formData.nights],
+                            add_price: e.target.value,
+                          },
+                        }))
+                      }
+                      className="p-2 border border-gray-300 rounded w-1/4"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Old Add Price"
+                      value={newNightsOptions[formData.nights]?.old_add_price || ""}
+                      onChange={(e) =>
+                        setNewNightsOptions((prev) => ({
+                          ...prev,
+                          [formData.nights]: {
+                            ...prev[formData.nights],
+                            old_add_price: e.target.value,
+                          },
+                        }))
+                      }
+                      className="p-2 border border-gray-300 rounded w-1/4"
+                    />
+                    <button
+                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                      onClick={() => addNightsOption(formData.nights)}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Facilities */}
               <div>
@@ -991,54 +1096,57 @@ const AllTours = () => {
                   </div>
 
                   {/* Middle Days */}
-                  {Object.keys(formData.itinerary.middle_days).length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-bold">Middle Days</h3>
-                      {Object.keys(formData.itinerary.middle_days).map((dayKey) => (
-                        <div key={dayKey} className="border p-4 rounded-md bg-blue-100 my-4">
-                          <span className="bg-blue-500 text-white px-6 py-2 rounded-lg">
-                            {`Day ${dayKey.split("_")[1]}`}
-                          </span>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-500 mt-3">
-                              Title
-                            </label>
-                            <input
-                              type="text"
-                              value={formData.itineraryTitles.middle_days[dayKey]}
-                              onChange={(e) =>
-                                handleItineraryTitleChange(e, "middle_days", dayKey)
-                              }
-                              placeholder={`Title for Day ${dayKey.split("_")[1]}`}
-                              className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-500 mt-1">
-                              Activities
-                            </label>
-                            <textarea
-                              rows="2"
-                              placeholder={`Activities for Day ${dayKey.split("_")[1]}`}
-                              value={formData.itinerary.middle_days[dayKey]}
-                              onChange={(e) =>
-                                handleItineraryChange(e, "middle_days", dayKey)
-                              }
-                              className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-500 mt-1">
-                              Images
-                            </label>
-                            <input
-                              type="file"
-                              onChange={(e) => handleImageUpload(e, dayKey, "middle_days")}
-                              multiple
-                              className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-                            />
-                            <div className="flex space-x-2 mt-4">
-                              {formData.itineraryImages.middle_days[dayKey]?.map((image, idx) => (
+                  {Object.keys(formData.itinerary.middle_days)
+                    .sort(
+                      (a, b) =>
+                        parseInt(a.split("_")[1], 10) - parseInt(b.split("_")[1], 10)
+                    )
+                    .map((dayKey) => (
+                      <div key={dayKey} className="border p-4 rounded-md bg-blue-100 my-4">
+                        <span className="bg-blue-500 text-white px-6 py-2 rounded-lg">
+                          {`Day ${dayKey.split("_")[1]}`}
+                        </span>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-500 mt-3">
+                            Title
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.itineraryTitles.middle_days[dayKey]}
+                            onChange={(e) =>
+                              handleItineraryTitleChange(e, "middle_days", dayKey)
+                            }
+                            placeholder={`Title for Day ${dayKey.split("_")[1]}`}
+                            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-500 mt-1">
+                            Activities
+                          </label>
+                          <textarea
+                            rows="2"
+                            placeholder={`Activities for Day ${dayKey.split("_")[1]}`}
+                            value={formData.itinerary.middle_days[dayKey]}
+                            onChange={(e) =>
+                              handleItineraryChange(e, "middle_days", dayKey)
+                            }
+                            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-500 mt-1">
+                            Images
+                          </label>
+                          <input
+                            type="file"
+                            onChange={(e) => handleImageUpload(e, dayKey, "middle_days")}
+                            multiple
+                            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                          />
+                          <div className="flex space-x-2 mt-4">
+                            {formData.itineraryImages.middle_days[dayKey]?.map(
+                              (image, idx) => (
                                 <div key={idx} className="relative">
                                   <img
                                     src={image}
@@ -1047,19 +1155,20 @@ const AllTours = () => {
                                   />
                                   <button
                                     type="button"
-                                    onClick={() => handleRemoveImage(dayKey, idx, "middle_days")}
+                                    onClick={() =>
+                                      handleRemoveImage(dayKey, idx, "middle_days")
+                                    }
                                     className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                                   >
                                     <FaTrash />
                                   </button>
                                 </div>
-                              ))}
-                            </div>
+                              )
+                            )}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    ))}
 
                   {/* Departure Day */}
                   <div className="border p-4 rounded-md bg-blue-100">
