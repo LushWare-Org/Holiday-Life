@@ -325,6 +325,68 @@ const AllTours = () => {
     });
   };
 
+  // Remove Night Option Handler:
+  // Removes the entire pricing group for a given night and, if it's the maximum,
+  // removes extra itinerary middle days accordingly.
+  const handleRemoveNight = (nightKey) => {
+    // Get all night keys as numbers and sort them.
+    const nightsKeys = Object.keys(formData.nightsOptions)
+      .map(Number)
+      .sort((a, b) => a - b);
+
+    // If only one night option exists, do not allow removal.
+    if (nightsKeys.length <= 1) {
+      Swal.fire("Error", "At least one night option must remain.", "error");
+      return;
+    }
+
+    const currentNight = parseInt(nightKey, 10);
+    // Create a copy and remove the selected night group.
+    let updatedNightsOptions = { ...formData.nightsOptions };
+    delete updatedNightsOptions[nightKey];
+
+    // Get remaining keys as numbers and determine the new maximum.
+    const remainingKeys = Object.keys(updatedNightsOptions)
+      .map(Number)
+      .sort((a, b) => a - b);
+    const newConfirmedNight = remainingKeys[remainingKeys.length - 1];
+
+    // If the removed night is the maximum,
+    // then remove the extra itinerary middle days.
+    if (currentNight === Math.max(...nightsKeys)) {
+      for (let i = newConfirmedNight + 1; i <= currentNight; i++) {
+        const dayKey = `day_${i}`;
+        if (formData.itinerary.middle_days) {
+          delete formData.itinerary.middle_days[dayKey];
+        }
+        if (formData.itineraryImages.middle_days) {
+          delete formData.itineraryImages.middle_days[dayKey];
+        }
+        if (formData.itineraryTitles.middle_days) {
+          delete formData.itineraryTitles.middle_days[dayKey];
+        }
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        nights: newConfirmedNight.toString(), // update confirmed night count
+        nightsOptions: updatedNightsOptions,
+        itinerary: { ...prev.itinerary },
+        itineraryImages: { ...prev.itineraryImages },
+        itineraryTitles: { ...prev.itineraryTitles },
+      }));
+    } else {
+      // If the removed night is not the maximum, simply remove its pricing group.
+      setFormData((prev) => ({
+        ...prev,
+        nights: prev.nights === nightKey ? newConfirmedNight.toString() : prev.nights,
+        nightsOptions: updatedNightsOptions,
+      }));
+    }
+
+    Swal.fire("Success", `Night option ${nightKey} removed.`, "success");
+  };
+
   // Adds a new option to an existing nightsKey
   const addNightsOption = (nightsKey) => {
     const newOption = newNightsOptions[nightsKey];
@@ -939,9 +1001,19 @@ const AllTours = () => {
               {/* --- Nights Options (Add-on Pricing) Section --- */}
               {formData.nights && (
                 <div className="border p-4 rounded-md bg-gray-50">
-                  <h3 className="text-xl font-bold mb-4">
-                    Nights Options (Add-on Pricing) for {formData.nights} nights
-                  </h3>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-xl font-bold mb-4">
+                      Nights Options (Add-on Pricing) for {formData.nights} nights
+                    </h3>
+                    {Object.keys(formData.nightsOptions).length > 1 && (
+                      <button
+                        className="bg-red-600 text-white px-4 py-2 rounded"
+                        onClick={() => handleRemoveNight(formData.nights)}
+                      >
+                        Remove Option ({formData.nights} nights)
+                      </button>
+                    )}
+                  </div>
                   {(Array.isArray(formData.nightsOptions[formData.nights])
                     ? formData.nightsOptions[formData.nights]
                     : []
