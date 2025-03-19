@@ -862,7 +862,7 @@ const AllTours = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600">Tour Image</label>
+                <label className="block text-sm font-medium text-gray-600">Tour Image <span className="text-gray-500/40 text-sm"> (Size 1×1)</span></label>
                 <input
                   type="file"
                   multiple
@@ -890,7 +890,7 @@ const AllTours = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-0">Destination Images</label>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Destination Images <span className="text-gray-500/50 text-sm"> (Size 3×2)</span></label>
                 <input
                   type="file"
                   multiple
@@ -920,7 +920,7 @@ const AllTours = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600">Activity Images</label>
+                <label className="block text-sm font-medium text-gray-600">Activity Images <span className="text-gray-500/50 text-sm"> (Size 3×2)</span></label>
                 <input
                   type="file"
                   multiple
@@ -948,7 +948,7 @@ const AllTours = () => {
               </div>
                   
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-0">Hotel Images</label>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Hotel Images <span className="text-gray-500/50 text-sm"> (Size 3×2)</span></label>
                 <input
                   type="file"
                   multiple
@@ -1139,7 +1139,7 @@ const AllTours = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500 mt-1">Images</label>
+                      <label className="block text-sm font-medium text-gray-500 mt-1">Images <span className="text-gray-500/50 text-sm"> (Size 3×2)</span></label>
                       <input
                         type="file"
                         onChange={(e) => handleImageUpload(e, "first_day", "first_day")}
@@ -1209,6 +1209,7 @@ const AllTours = () => {
                         <div>
                           <label className="block text-sm font-medium text-gray-500 mt-1">
                             Images
+                            <span className="text-gray-500/50 text-sm"> (Size 3×2)</span>
                           </label>
                           <input
                             type="file"
@@ -1270,7 +1271,7 @@ const AllTours = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500 mt-1">Images</label>
+                      <label className="block text-sm font-medium text-gray-500 mt-1">Images <span className="text-gray-500/50 text-sm"> (Size 3×2)</span></label>
                       <input
                         type="file"
                         onChange={(e) => handleImageUpload(e, "last_day", "last_day")}

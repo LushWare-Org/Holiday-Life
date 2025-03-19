@@ -735,7 +735,7 @@ const TourForm = () => {
 
         {/* Tour Image Section */}
         <div>
-          <label className="block text-lg font-medium">Tour Image</label>
+          <label className="block text-lg font-medium">Tour Image <span className="text-gray-500/50 text-sm"> (Size 1×1)</span></label>
           <input
             type="file"
             multiple
@@ -769,7 +769,7 @@ const TourForm = () => {
 
         {/* Destination Images */}
         <div>
-          <label className="block text-lg font-medium">Destination Images</label>
+          <label className="block text-lg font-medium">Destination Images <span className="text-gray-500/50 text-sm"> (Size 3×2)</span></label>
           <input
             type="file"
             multiple
@@ -803,7 +803,7 @@ const TourForm = () => {
 
         {/* Activity Images */}
         <div>
-          <label className="block text-lg font-medium">Activity Images</label>
+          <label className="block text-lg font-medium">Activity Images <span className="text-gray-500/50 text-sm"> (Size 3×2)</span></label>
           <input
             type="file"
             multiple
@@ -837,7 +837,7 @@ const TourForm = () => {
 
         {/* Hotel Images */}
         <div>
-          <label className="block text-lg font-medium">Hotel Images</label>
+          <label className="block text-lg font-medium">Hotel Images <span className="text-gray-500/50 text-sm"> (Size 3×2)</span></label>
           <input
             type="file"
             multiple
@@ -993,6 +993,7 @@ const TourForm = () => {
                   className="p-2 w-full border border-gray-300 rounded-md"
                 />
                 <div className="space-x-2 mt-4">
+                  <span className="text-gray-500/50 text-sm"> (Size 3×2)</span>
                   <input
                     type="file"
                     onChange={(e) => handleImageUpload(e, "first_day", "first_day")}
@@ -1047,6 +1048,7 @@ const TourForm = () => {
                       className="p-2 w-full border border-gray-300 rounded-md"
                     />
                     <div className="space-x-2 mt-4">
+                      <span className="text-gray-500/50 text-sm"> (Size 3×2)</span>
                       <input
                         type="file"
                         onChange={(e) => handleImageUpload(e, dayKey, "middle_days")}
@@ -1095,6 +1097,7 @@ const TourForm = () => {
                   className="p-2 w-full border border-gray-300 rounded-md"
                 />
                 <div className="space-x-2 mt-4">
+                  <span className="text-gray-500/50 text-sm"> (Size 3×2)</span>
                   <input
                     type="file"
                     onChange={(e) => handleImageUpload(e, "last_day", "last_day")}
