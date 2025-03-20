@@ -753,6 +753,17 @@ const AllTours = () => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-600 mb-0">Old Price</label>
+                <input
+                  type="text"
+                  name="oldPrice"
+                  value={formData.oldPrice}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-600">Expiry Date</label>
                 <input
                   type="date"
@@ -1319,17 +1330,6 @@ const AllTours = () => {
                   onChange={handleInputChange}
                   className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                   placeholder="List of exclusions and use ENTER key for each activity"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-0">Old Price</label>
-                <input
-                  type="text"
-                  name="oldPrice"
-                  value={formData.oldPrice}
-                  onChange={handleInputChange}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                 />
               </div>
 
