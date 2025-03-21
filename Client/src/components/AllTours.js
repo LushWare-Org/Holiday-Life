@@ -513,11 +513,11 @@ const AllTours = () => {
       try {
         const formDataToSend = new FormData();
         formDataToSend.append("image", file);
-        const response = await fetch(
+        const response = await axios.post(
           "https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39",
+          formDataToSend,
           {
-            method: "POST",
-            body: formDataToSend,
+            headers: { "Content-Type": "multipart/form-data" },
           }
         );
         if (!response.ok) {
