@@ -525,13 +525,7 @@ const TourForm = () => {
           oldPrice: formData.oldPrice,
         };
 
-        const response = await fetch("/tours", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+        const response = await axios.post("/tours", payload);
 
         if (response.ok) {
           Swal.fire("Success!", "Tour has been created successfully.", "success");
