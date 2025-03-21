@@ -498,61 +498,61 @@ const TourForm = () => {
     setNightsInput("");
   };
 
-  // Submit entire tour
   const handleSubmitTour = async () => {
-    if (validateForm()) {
-      try {
-        const payload = {
-          title: formData.title,
-          price: formData.price,
-          nights: formData.nightsOptions,
-          expiry_date: formData.expiry_date,
-          valid_from: formData.valid_from,
-          valid_to: formData.valid_to,
-          food_category: formData.food_category,
-          country: formData.country,
-          markets: formData.markets,
-          tour_summary: formData.tour_summary,
-          tour_image: formData.tour_image[0],
-          destination_images: formData.destination_images,
-          activity_images: formData.activity_images,
-          hotel_images: formData.hotel_images,
-          inclusions: formData.inclusions.split("\n"),
-          exclusions: formData.exclusions.split("\n"),
-          facilities: formData.facilities.split("\n"),
-          itinerary: formData.itinerary,
-          itinerary_images: formData.itineraryImages,
-          itinerary_titles: formData.itineraryTitles,
-          oldPrice: formData.oldPrice,
-        };
-
-        const response = await axios.post("/tours", payload);
-
-        if (response.ok) {
-          Swal.fire("Success!", "Tour has been created successfully.", "success");
-          handleResetItinerary();
-        } else {
-          // -- FIX: Read the response body once, then parse JSON if possible
-          const rawText = await response.text();
-          let errorData;
-          try {
-            errorData = JSON.parse(rawText);
-          } catch (e) {
-            // If not valid JSON, just treat it as text
-            errorData = { message: rawText };
-          }
-
-          console.error("Response error:", errorData);
-          throw new Error(errorData.message || "Failed to create the tour.");
-        }
-      } catch (error) {
-        console.error("Error:", error);
+    if (!validateForm()) {
+      Swal.fire("Error", "Please fill out all required fields.", "error");
+      return;
+    }
+  
+    try {
+      const payload = {
+        title: formData.title,
+        price: formData.price,
+        nights: formData.nightsOptions,
+        expiry_date: formData.expiry_date,
+        valid_from: formData.valid_from,
+        valid_to: formData.valid_to,
+        food_category: formData.food_category,
+        country: formData.country,
+        markets: formData.markets,
+        tour_summary: formData.tour_summary,
+        tour_image: formData.tour_image[0],
+        destination_images: formData.destination_images,
+        activity_images: formData.activity_images,
+        hotel_images: formData.hotel_images,
+        inclusions: formData.inclusions.split("\n"),
+        exclusions: formData.exclusions.split("\n"),
+        facilities: formData.facilities.split("\n"),
+        itinerary: formData.itinerary,
+        itinerary_images: formData.itineraryImages,
+        itinerary_titles: formData.itineraryTitles,
+        oldPrice: formData.oldPrice,
+      };
+  
+      // Make sure your backend is actually at "/tours" or use the full URL if needed
+      const { data } = await axios.post("/tours", payload);
+  
+      // If axios didn't throw, it's a success status (2xx)
+      Swal.fire("Success!", "Tour has been created successfully.", "success");
+      handleResetItinerary();
+  
+    } catch (error) {
+      // axios throws on non-2xx status or network error
+      console.error("Error creating tour:", error);
+  
+      if (error.response) {
+        // The request reached the server, but the server responded with a status != 2xx
+        Swal.fire("Error", error.response.data?.message || "Failed to create the tour.", "error");
+      } else if (error.request) {
+        // The request was made but no response received
+        Swal.fire("Error", "No response from server.", "error");
+      } else {
+        // Something else happened while setting up the request
         Swal.fire("Error", error.message, "error");
       }
-    } else {
-      Swal.fire("Error", "Please fill out all required fields.", "error");
     }
   };
+  
 
   // Handle changes in food category
   const handleFoodCategoryChange = (catKey, index, val) => {
