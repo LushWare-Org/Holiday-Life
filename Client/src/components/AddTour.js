@@ -511,7 +511,6 @@ const TourForm = () => {
         const payload = {
           title: formData.title,
           price: formData.price,
-          // The nights field now contains the nights options object.
           nights: formData.nightsOptions,
           expiry_date: formData.expiry_date,
           valid_from: formData.valid_from,
@@ -545,7 +544,13 @@ const TourForm = () => {
           Swal.fire("Success!", "Tour has been created successfully.", "success");
           handleResetItinerary();
         } else {
-          const errorData = await response.json();
+          // Modified part: try parse JSON, if fails fallback to text.
+          let errorData;
+          try {
+            errorData = await response.json();
+          } catch (e) {
+            errorData = { message: await response.text() };
+          }
           console.error("Response error:", errorData);
           throw new Error(errorData.message || "Failed to create the tour.");
         }
