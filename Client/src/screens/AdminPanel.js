@@ -37,19 +37,20 @@ const AdminPanel = () => {
   const { isMobile, isTablet } = useDeviceType();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    try{
-      if (token) {
+    const checkTokenExpiration = () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      try {
         const decodedToken = jwtDecode(token);
         if (decodedToken.exp < Date.now() / 1000) {
           navigate('/login');
         }
-      }
-      else {
+      } catch (error) { 
         navigate('/login');
       }
-    } catch (error) { 
-      navigate('/login');
     }
     checkTokenExpiration();
 
