@@ -9,7 +9,7 @@ const marketMapping = {
   3: "Asian Markets",
   4: "Middle East Markets",
   5: "Russia and CIS Markets",
-  6: "All Markets",
+  6: "Rest of the World",
 };
 
 // Each key in foodCategoryMapping is 0,1,2 for your DB structure
@@ -489,7 +489,7 @@ const AllTours = () => {
           },
         }));
       } else if (
-        section === "tour" ||
+        section === "tour_image" ||
         section === "destination_images" ||
         section === "activity_images" ||
         section === "hotel_images"
@@ -541,7 +541,7 @@ const AllTours = () => {
             },
           }));
         } else if (
-          section === "tour" ||
+          section === "tour_image" ||
           section === "destination_images" ||
           section === "activity_images" ||
           section === "hotel_images"
@@ -580,7 +580,7 @@ const AllTours = () => {
         },
       }));
     } else if (
-      section === "tour" ||
+      section === "tour_image" ||
       section === "destination_images" ||
       section === "activity_images" ||
       section === "hotel_images"
@@ -603,17 +603,42 @@ const AllTours = () => {
 
   const handleSave = async () => {
     try {
+      // 1) Parse top-level numeric fields
+      const priceInt = parseInt(formData.price, 10) || 0;
+      const oldPriceInt = parseInt(formData.oldPrice, 10) || 0;
+  
+      // 2) Parse food_category arrays
+      const parsedFoodCategory = {};
+      Object.keys(formData.food_category).forEach((catKey) => {
+        const [val1, val2] = formData.food_category[catKey];
+        parsedFoodCategory[catKey] = [
+          parseInt(val1, 10) || 0,
+          parseInt(val2, 10) || 0,
+        ];
+      });
+  
+      // 3) Parse nightsOptions
+      const parsedNightsOptions = {};
+      Object.keys(formData.nightsOptions).forEach((nKey) => {
+        parsedNightsOptions[nKey] = formData.nightsOptions[nKey].map((opt) => ({
+          ...opt,
+          add_price: parseInt(opt.add_price, 10) || 0,
+          old_add_price: parseInt(opt.old_add_price, 10) || 0,
+        }));
+      });
+  
+      // 4) Build final payload with integers
       const payload = {
         title: formData.title,
-        price: formData.price,
+        price: priceInt,
         baseNights: parseInt(formData.nights, 10) || 0,
-        nights: formData.nightsOptions,
+        nights: parsedNightsOptions,
         expiry_date: formData.expiry_date,
         valid_from: formData.valid_from,
         valid_to: formData.valid_to,
-        food_category: formData.food_category,
+        food_category: parsedFoodCategory,
         country: formData.country,
-        markets: formData.markets,  
+        markets: formData.markets,
         tour_summary: formData.tour_summary,
         tour_image: formData.tour_image[0] || "",
         destination_images: formData.destination_images,
@@ -625,22 +650,20 @@ const AllTours = () => {
         itinerary: formData.itinerary,
         itinerary_images: formData.itineraryImages,
         itinerary_titles: formData.itineraryTitles,
-        oldPrice: formData.oldPrice,
+        oldPrice: oldPriceInt,
       };
-
+  
+      // 5) Send to backend
       const response = await axios.put(`/tours/${editTour._id}`, payload);
-
-      if (response.status === 200) {
-        Swal.fire("Success!", "Tour has been updated successfully.", "success");
-        setTours((prevTours) =>
-          prevTours.map((tour) =>
-            tour._id === editTour._id ? response.data : tour
-          )
-        );
-        setEditTour(null);
-      } else {
+      if (response.status !== 200) {
         throw new Error("Failed to update the tour.");
       }
+  
+      Swal.fire("Success!", "Tour has been updated successfully.", "success");
+      setTours((prevTours) =>
+        prevTours.map((t) => (t._id === editTour._id ? response.data : t))
+      );
+      setEditTour(null);
     } catch (error) {
       console.error("Error updating tour:", error);
       Swal.fire("Error", error.message, "error");
@@ -877,7 +900,7 @@ const AllTours = () => {
                 <input
                   type="file"
                   multiple
-                  onChange={(e) => handleImageUpload(e, "tour_image", "tour")}
+                  onChange={(e) => handleImageUpload(e, "tour_image", "tour_image")}
                   className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                 />
                 <div className="flex space-x-2 mt-4">
@@ -890,7 +913,7 @@ const AllTours = () => {
                       />
                       <button
                         type="button"
-                        onClick={() => handleRemoveImage("tour_image", index, "tour")}
+                        onClick={() => handleRemoveImage("tour_image", index, "tour_image")}
                         className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                       >
                         <FaTrash />

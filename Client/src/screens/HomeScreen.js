@@ -164,7 +164,7 @@ const HomeScreen = () => {
               }}
             >
               Holiday Life Travel Agency is your premier partner in crafting unforgettable travel experiences. Specializing in bespoke itineraries and personalized service, we offer curated journeys to destinations worldwide, ensuring every detail of your holiday is meticulously planned. Whether you seek a relaxing beach getaway, an adventurous expedition, or a cultural exploration, Holiday Life Travel Agency turns your dreams into reality with expertise and passion, making every trip a journey to remember. </p>
-            <a
+            <button
               href="none"
               target="_blank"
               rel="noopener noreferrer"
@@ -189,11 +189,11 @@ const HomeScreen = () => {
                 e.target.style.backgroundColor = '#023e8a';
               }}
               
-              onClick={{handleNavigate}}
+              onClick={handleNavigate}
               
             >
               Discover Tours
-            </a>
+            </button>
           </div>
         </div>
       </Box>

@@ -114,7 +114,7 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
   };
 
   const filteredTours = tours.filter((tour) => {
-    const searchNightsValue = searchNights ? parseInt(searchNights) : null;
+    const searchNightsValue = searchNights ? parseInt(searchNights, 10) : null;
 
     const currentDate = new Date();
     const tourExpiryDate = new Date(tour.expiry_date);
@@ -133,9 +133,13 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
         ? localToUSD(parseFloat(searchMaxPrice))
         : null;
 
+      const hasMatchingNights =
+        !searchNightsValue ||
+        (tour.nights && Object.keys(tour.nights).includes(searchNightsValue.toString()));
+    
       return (
         (!search || tour.title.toLowerCase().includes(search.toLowerCase())) &&
-        (!searchNightsValue || tour.nights === searchNightsValue) &&
+        hasMatchingNights &&
         (!minValUSD || tour.price >= minValUSD) &&
         (!maxValUSD || tour.price <= maxValUSD) &&
         (!searchCountry || tour.country.toLowerCase().includes(searchCountry.toLowerCase())) &&

@@ -14,6 +14,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import { Divider } from 'antd';
 
 function useDeviceType() {
   const [deviceType, setDeviceType] = useState({
@@ -602,6 +603,27 @@ const TourDetails = () => {
             </Box>
         </Box>
         )}
+
+        <Divider style={{ margin: '0 0' }} />
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+              Facilities
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {tour.facilities.map((facility, index) => (
+                <div
+                  key={index}
+                  className="relative p-4 rounded-lg border border-gray-200 bg-white hover:shadow-md transition-shadow duration-200 group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg" />
+                  <span className="relative text-gray-700 font-medium">
+                    {facility}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        <Divider style={{ margin: '20px 0 20px 0' }} />
         
         {tour.tour_image && (
           <div style={{ display: 'flex',flexDirection: isMobile? 'column' : 'row', alignItems: 'flex-start', gap: '20px' }}>

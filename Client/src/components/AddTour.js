@@ -9,7 +9,7 @@ const marketMapping = {
   3: "Asian Markets",
   4: "Middle East Markets",
   5: "Russia and CIS Markets",
-  6: "All Markets",
+  6: "Rest of the world",
 };
 
 const foodCategoryMapping = {
@@ -505,14 +505,40 @@ const TourForm = () => {
     }
   
     try {
+      // 1) Parse top-level numeric fields
+      const priceInt = parseInt(formData.price, 10) || 0;
+      const oldPriceInt = parseInt(formData.oldPrice, 10) || 0;
+  
+      // 2) Parse food_category arrays (each is [addPrice, oldAddPrice])
+      const parsedFoodCategory = {};
+      Object.keys(formData.food_category).forEach((catKey) => {
+        const [val1, val2] = formData.food_category[catKey];
+        parsedFoodCategory[catKey] = [
+          parseInt(val1, 10) || 0,
+          parseInt(val2, 10) || 0,
+        ];
+      });
+  
+      // 3) Parse each "nightsOptions" entry (add_price & old_add_price)
+      const parsedNightsOptions = {};
+      Object.keys(formData.nightsOptions).forEach((nKey) => {
+        // each nightsOptions[nKey] is an array of option objects
+        parsedNightsOptions[nKey] = formData.nightsOptions[nKey].map((opt) => ({
+          ...opt,
+          add_price: parseInt(opt.add_price, 10) || 0,
+          old_add_price: parseInt(opt.old_add_price, 10) || 0,
+        }));
+      });
+  
+      // 4) Build the final payload with parsed values
       const payload = {
         title: formData.title,
-        price: formData.price,
-        nights: formData.nightsOptions,
+        price: priceInt,
+        nights: parsedNightsOptions,
         expiry_date: formData.expiry_date,
         valid_from: formData.valid_from,
         valid_to: formData.valid_to,
-        food_category: formData.food_category,
+        food_category: parsedFoodCategory,
         country: formData.country,
         markets: formData.markets,
         tour_summary: formData.tour_summary,
@@ -526,30 +552,24 @@ const TourForm = () => {
         itinerary: formData.itinerary,
         itinerary_images: formData.itineraryImages,
         itinerary_titles: formData.itineraryTitles,
-        oldPrice: formData.oldPrice,
+        oldPrice: oldPriceInt,
       };
   
-      // Make sure your backend is actually at "/tours" or use the full URL if needed
-      const { data } = await axios.post("/tours", payload);
+      console.log("Final payload:", payload);
   
-      // If axios didn't throw, it's a success status (2xx)
+      // 5) Send the request
+      const response = await axios.post("/tours", payload);
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create the tour.");
+      }
+  
       Swal.fire("Success!", "Tour has been created successfully.", "success");
       handleResetItinerary();
-  
     } catch (error) {
-      // axios throws on non-2xx status or network error
-      console.error("Error creating tour:", error);
-  
-      if (error.response) {
-        // The request reached the server, but the server responded with a status != 2xx
-        Swal.fire("Error", error.response.data?.message || "Failed to create the tour.", "error");
-      } else if (error.request) {
-        // The request was made but no response received
-        Swal.fire("Error", "No response from server.", "error");
-      } else {
-        // Something else happened while setting up the request
-        Swal.fire("Error", error.message, "error");
-      }
+      console.error("Error:", error);
+      Swal.fire("Error", error.message, "error");
     }
   };
   
