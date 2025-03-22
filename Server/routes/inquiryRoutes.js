@@ -4,6 +4,15 @@ const Inquiry = require('../models/inquirySubmission'); // Path to your Inquiry 
 const router = express.Router();
 require('dotenv').config(); 
 
+const transporter = nodemailer.createTransport({
+  host: 'smtp.hostinger.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'sales@holidaylife.travel',
+    pass: 'Sales@holi_997',
+  },
+});
 
 const sendInquiryEmail = async ({ name, email, phone_number, travel_date, traveller_count, message, tour, final_price, currency, selected_nights_key, selected_nights_option, selected_food_category }) => {
   const htmlContent = `
