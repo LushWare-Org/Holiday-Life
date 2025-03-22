@@ -81,7 +81,8 @@ const TourInquiries = () => {
       ...item,
       _id: item._id?.$oid || item._id,
       travel_date: item.travel_date ? new Date(item.travel_date) : null,
-      }));
+      }))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       setInquiries(transformed);
     } catch (error) {

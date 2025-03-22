@@ -44,8 +44,11 @@ const ContactInquiries = () => {
   const fetchInquiries = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/contact/inquiries');
-      setInquiries(response.data);
+      const response = await fetch('/contact/inquiries');
+      if (!response.ok) throw new Error('Failed to fetch inquiries.');
+      const data = await response.json();
+      data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setInquiries(data);
     } catch (error) {
       console.error('Error fetching inquiries:', error);
       message.error(error.message || 'Failed to fetch inquiries.');
