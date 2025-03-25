@@ -1,43 +1,64 @@
-
 import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardMedia, CardContent, Typography, Box, Button, CircularProgress, TextField, Autocomplete } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import { useCurrency } from '../../screens/CurrencyContext';
 
-const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
+function useDeviceType() {
+  const [deviceType, setDeviceType] = useState({
+    isMobile: window.innerWidth <= 768,
+    isTablet: window.innerWidth > 768 && window.innerWidth <= 1024,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDeviceType({
+        isMobile: window.innerWidth <= 768,
+        isTablet: window.innerWidth > 768 && window.innerWidth <= 1024,
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return deviceType;
+}
+
+const ImageGallery = ({ searchQuery = '', passedCountry = '' }) => {
   const [tours, setTours] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const query = new URLSearchParams(location.search);
-  const searchTerm = searchQuery|| query.get('search') || '';
+  const searchTerm = searchQuery || query.get('search') || '';
   const nights = query.get('nights') || '';
   const country = passedCountry || query.get('country') || '';
   const market = query.get('market') || '';
   const minPrice = query.get('minPrice') || '';
   const maxPrice = query.get('maxPrice') || '';
+  // Use the currency stored in localStorage for consistency.
   const selectedCurrency = localStorage.getItem('selectedCurrency') || 'USD';
+
   const [search, setSearch] = useState(searchTerm);
   const [searchNights, setSearchNights] = useState(nights);
   const [searchCountry, setSearchCountry] = useState(country);
-  
   const [searchMarket, setSearchMarket] = useState('');
   const [exchangeRates, setExchangeRates] = useState({});
   const [searchMinPrice, setSearchMinPrice] = useState(minPrice);
   const [searchMaxPrice, setSearchMaxPrice] = useState(maxPrice);
-  const { isMobile, isTablet} = useDeviceType();
 
-  const currency = useCurrency();
+  const { isMobile, isTablet } = useDeviceType();
 
+  // Convert price using selectedCurrency.
   const convertPrice = (priceInUSD) => {
-    if (!exchangeRates[currency]) return priceInUSD.toLocaleString();
-    return (priceInUSD * exchangeRates[currency]).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (!exchangeRates[selectedCurrency]) return priceInUSD.toLocaleString();
+    return (priceInUSD * exchangeRates[selectedCurrency]).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   };
-
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -59,31 +80,10 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
         console.error('Error fetching exchange rates:', error);
       }
     };
-  
-    fetchExchangeRates();
 
+    fetchExchangeRates();
     fetchTours();
   }, []);
-
-  function useDeviceType() {
-    const [deviceType, setDeviceType] = useState({
-      isMobile: window.innerWidth <= 768,
-      isTablet: window.innerWidth > 768 && window.innerWidth <= 1024,
-    });
-  
-    useEffect(() => {
-      const handleResize = () => {
-        setDeviceType({
-          isMobile: window.innerWidth <= 768,
-          isTablet: window.innerWidth > 768 && window.innerWidth <= 1024,
-        });
-      };
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-  
-    return deviceType;
-  }
 
   useEffect(() => {
     setSearch(searchTerm);
@@ -102,52 +102,44 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
     5: 'Russia and CIS',
     6: 'Rest of the World',
   };
-  
-  // Also create the inverse for easy lookup
+
+  // Inverse mapping for lookup.
   const marketMappingInverse = Object.fromEntries(
     Object.entries(marketMapping).map(([key, value]) => [value, Number(key)])
   );
 
   const localToUSD = (localPrice) => {
-    if (!exchangeRates[currency]) return localPrice; 
-    return localPrice / exchangeRates[currency];
+    if (!exchangeRates[selectedCurrency]) return localPrice;
+    return localPrice / exchangeRates[selectedCurrency];
   };
 
   const filteredTours = tours.filter((tour) => {
     const searchNightsValue = searchNights ? parseInt(searchNights, 10) : null;
-
     const currentDate = new Date();
     const tourExpiryDate = new Date(tour.expiry_date);
-
     if (tourExpiryDate < currentDate) {
       return false;
     }
     const marketMatch =
-    !searchMarket ||
-    (Array.isArray(tour.markets) && tour.markets.includes(Number(searchMarket)));
+      !searchMarket ||
+      (Array.isArray(tour.markets) && tour.markets.includes(Number(searchMarket)));
     
-    const minValUSD = searchMinPrice
-      ? localToUSD(parseFloat(searchMinPrice))
-      : null;
-    const maxValUSD = searchMaxPrice
-        ? localToUSD(parseFloat(searchMaxPrice))
-        : null;
-
-      const hasMatchingNights =
-        !searchNightsValue ||
-        (tour.nights && Object.keys(tour.nights).includes(searchNightsValue.toString()));
+    const minValUSD = searchMinPrice ? localToUSD(parseFloat(searchMinPrice)) : null;
+    const maxValUSD = searchMaxPrice ? localToUSD(parseFloat(searchMaxPrice)) : null;
+    const hasMatchingNights =
+      !searchNightsValue ||
+      (tour.nights && Object.keys(tour.nights).includes(searchNightsValue.toString()));
     
-      return (
-        (!search || tour.title.toLowerCase().includes(search.toLowerCase())) &&
-        hasMatchingNights &&
-        (!minValUSD || tour.price >= minValUSD) &&
-        (!maxValUSD || tour.price <= maxValUSD) &&
-        (!searchCountry || tour.country.toLowerCase().includes(searchCountry.toLowerCase())) &&
-        marketMatch
-      );
-    });
+    return (
+      (!search || tour.title.toLowerCase().includes(search.toLowerCase())) &&
+      hasMatchingNights &&
+      (!minValUSD || tour.price >= minValUSD) &&
+      (!maxValUSD || tour.price <= maxValUSD) &&
+      (!searchCountry || tour.country.toLowerCase().includes(searchCountry.toLowerCase())) &&
+      marketMatch
+    );
+  });
 
-  
   const handleSearchSubmit = (event) => {
     event.preventDefault();
     const queryParams = new URLSearchParams({
@@ -160,26 +152,6 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
     }).toString();
     navigate(`/imagegallery?${queryParams}`);
   };
-
-  function useDeviceType() {
-    const [deviceType, setDeviceType] = useState({
-      isMobile: window.innerWidth <= 768,
-      isTablet: window.innerWidth > 768 && window.innerWidth <= 1024,
-    });
-  
-    useEffect(() => {
-      const handleResize = () => {
-        setDeviceType({
-          isMobile: window.innerWidth <= 768,
-          isTablet: window.innerWidth > 768 && window.innerWidth <= 1024,
-        });
-      };
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-  
-    return deviceType;
-  }
 
   if (loading) {
     return (
@@ -206,7 +178,7 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
 
   return (
     <Box sx={{ width: '100%', minHeight: '65vh', padding: '20px 30px', backgroundColor: '#f9f9f9' }}>
-      <Box 
+      <Box
         mb={3}
         component="form"
         onSubmit={handleSearchSubmit}
@@ -247,7 +219,6 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
           value={searchMaxPrice}
           onChange={(e) => setSearchMaxPrice(e.target.value)}
         />
-
         <TextField
           fullWidth
           label="Country of Travel"
@@ -285,7 +256,6 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
               }}
             >
               <Box sx={{ position: 'relative' }}>
-                {/* Check if images array is empty and use a default placeholder image */}
                 <CardMedia
                   component="img"
                   height="200"
@@ -311,7 +281,7 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
                 >
                   <Typography variant="body2" fontWeight="bold">
                     {item.nights && typeof item.nights === 'object' && Object.keys(item.nights).length > 0
-                      ? `${Object.keys(item.nights)[0]} Days/${Object.keys(item.nights)[0]} Nights`  // Get the first key
+                      ? `${Object.keys(item.nights)[0]} Days/${Object.keys(item.nights)[0]} Nights`
                       : 'N/A'}
                   </Typography>
                 </Box>
@@ -334,7 +304,6 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
                     justifyContent="space-between"
                     mb={1}
                   >
-                    {/* Check if price exists and is a valid number before calling toLocaleString */}
                     {selectedCurrency} {item.price && !isNaN(item.price) ? convertPrice(item.price) : ''}
                     {item.oldPrice && !isNaN(item.oldPrice) && (
                       <Typography
@@ -342,12 +311,12 @@ const ImageGallery = ({ searchQuery = '', passedCountry='' }) => {
                         variant="body1"
                         sx={{ textDecoration: 'line-through', marginLeft: 1, color: 'text.secondary' }}
                       >
-                        {selectedCurrency} ${convertPrice(item.oldPrice)}
+                        {selectedCurrency} {convertPrice(item.oldPrice)}
                       </Typography>
                     )}
                     {item.oldPrice && !isNaN(item.oldPrice) && (
                       <Typography component="span" variant="body2" color="error" fontWeight="bold" backgroundColor="rgba(76, 175, 80, 0.1)" padding={0.5}>
-                        SAVE {selectedCurrency} {convertPrice(item.oldPrice-item.price)}
+                        SAVE {selectedCurrency} {convertPrice(item.oldPrice - item.price)}
                       </Typography>
                     )}
                   </Typography>

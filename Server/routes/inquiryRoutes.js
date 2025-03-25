@@ -32,8 +32,8 @@ const sendInquiryEmail = async ({ name, email, phone_number, travel_date, travel
       <p>${message}</p>
     `;
   const mailOptions = {
-    from: `"${name}" <${email}>`, // "John Doe" <john@gmail.com>
-    to: process.env.SMTP_USER,    // admin email from your .env or another email
+    from: email, // "John Doe" <john@gmail.com>
+    to: 'sales@holidaylife.travel',    // admin email from your .env or another email
     subject: `New Inquiry from ${name}`,
     html: htmlContent,
   };
