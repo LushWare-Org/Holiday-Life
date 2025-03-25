@@ -430,35 +430,183 @@ const TourDetails = () => {
                   </Typography>
                 </Box>
               </Box>
-
-              <Box sx={{ flexBasis: '100%', display: 'flex', justifyContent: 'center' }}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    background: 'linear-gradient(to right, #1e3a8a, #4f46e5)',
-                    color: 'white',
-                    padding: '7px 20px',
-                    fontSize: '20px',
-                    fontWeight: 'bold',
-                    fontFamily: 'Domine',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: '20px',
-                    width: isMobile ? '100%' : 'auto',
-                    '&:hover': {
-                      background: 'linear-gradient(to right, #1e40af, #3730a3)',
-                    },
-                  }}
-                  onClick={handleOpenDialog}
-                >
-                  Inquire Now
-                  <SendIcon sx={{ marginLeft: '10px', fontSize: 'inherit' }} />
-                </Button>
-              </Box>
             </Box>
           )}
         </Box>
+
+        {isMobile && (
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              gap: 1,
+              mb: 5
+            }}
+          >
+            {/* Days/Nights Card */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #1a365d 0%, #2563eb 100%)',
+                borderRadius: '16px',
+                padding: '15px',
+                color: 'white',
+                boxShadow: '0 10px 20px rgba(37, 99, 235, 0.2)',
+                transform: 'translateY(0)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 15px 30px rgba(37, 99, 235, 0.3)',
+                },
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                <AccessTimeIcon sx={{ fontSize: 25, mr: 1 }} />
+                {daysCount} Days / {nightsCount} Nights
+              </Typography>
+            </Box>
+
+            {/* Price Card */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #065f46 0%, #059669 100%)',
+                borderRadius: '16px',
+                padding: '15px',
+                color: 'white',
+                boxShadow: '0 10px 20px rgba(5, 150, 105, 0.2)',
+                transform: 'translateY(0)',
+                transition: 'transform 0.3s ease, boxShadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 15px 30px rgba(5, 150, 105, 0.3)',
+                },
+                textAlign: 'center',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
+                <AttachMoneyIcon sx={{ fontSize: 25, mr: 1 }} />
+                <Typography variant="h5" sx={{ fontWeight: 500 }}>
+                  Price
+                </Typography>
+              </Box>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {selectedCurrency} {convertPrice(totalPrice)}
+              </Typography>
+              {finalOldPrice > totalPrice && (
+                <Typography 
+                  sx={{ 
+                    textDecoration: 'line-through',
+                    color: 'rgba(255,255,255,0.7)',
+                  }}
+                >
+                  {selectedCurrency} {convertPrice(finalOldPrice)}
+                </Typography>
+              )}
+            </Box>
+
+            {/* Expires On Card */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #991b1b 0%, #dc2626 100%)',
+                borderRadius: '16px',
+                padding: '15px',
+                color: 'white',
+                boxShadow: '0 10px 20px rgba(220, 38, 38, 0.2)',
+                transform: 'translateY(0)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 15px 30px rgba(220, 38, 38, 0.3)',
+                },
+                textAlign: 'center',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
+                <CalendarMonthIcon sx={{ fontSize: 32, mr: 1 }} />
+                <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                  Expires On
+                </Typography>
+              </Box>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {new Date(tour.expiry_date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </Typography>
+            </Box>
+
+            {/* Valid Period Card */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+                borderRadius: '16px',
+                padding: '15px',
+                color: 'white',
+                boxShadow: '0 10px 20px rgba(59, 130, 246, 0.2)',
+                transform: 'translateY(0)',
+                transition: 'transform 0.3s ease, boxShadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 15px 30px rgba(59, 130, 246, 0.3)',
+                },
+                textAlign: 'center',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
+                <DateRangeIcon sx={{ fontSize: 32, mr: 1 }} />
+                <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                  Valid Period
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  {new Date(tour.valid_from).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>to</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  {new Date(tour.valid_to).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Inquire Now Button */}
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Button
+                sx={{
+                  background: 'linear-gradient(to right, #1e3a8a, #4f46e5)',
+                  color: 'white',
+                  padding: '10px 20px',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  fontFamily: 'Domine',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: '10px',
+                  width: '100%',
+                  '&:hover': {
+                    background: 'linear-gradient(to right, #1e40af, #3730a3)',
+                  },
+                }}
+                onClick={handleOpenDialog}
+              >
+                Inquire Now
+                <SendIcon sx={{ marginLeft: '10px', fontSize: 'inherit' }} />
+              </Button>
+            </Box>
+          </Box>
+        )}
+
+        <Divider style={{ margin: '0 0' }} />
 
         {/* Tour Images */}
         {tour.tour_image && (
