@@ -163,10 +163,8 @@ const EnquiryForm = ({
     try {
       const nightsOption =
         selectedTour?.nights?.[String(selectedNightsKey)]?.[String(selectedNightsOption)]?.option ||
-        selectedNightsOption; // fallback to raw value
-  
+        selectedNightsOption; 
       const foodCategoryLabel = foodCategoryMap[String(selectedFoodCategory)] || selectedFoodCategory;
-  
       const numericNightsKey = selectedNightsKey ? parseInt(selectedNightsKey, 10) : 0;
   
       const payload = {
@@ -177,7 +175,7 @@ const EnquiryForm = ({
         traveller_count: travellerCount,
         message,
         tour: selectedTour?.title,
-        final_price: finalPrice, // Ensure totalPrice is computed correctly in the parent
+        final_price: finalPrice,
         currency: selectedCurrency,
         selected_nights_key: numericNightsKey,
         selected_nights_option: nightsOption,
@@ -185,18 +183,17 @@ const EnquiryForm = ({
       };
   
       const response = await axios.post('/inquiries', payload);
+      console.log('Inquiry response:', response);
   
-      if (response.status >= 200 && response.status < 300) {
-        Swal.fire('Success!', 'Your inquiry has been submitted successfully.', 'success');
-        handleClose();
-      } else {
-        Swal.fire('Error!', 'Unexpected response from server. Please try again.', 'error');
-      }
+      // If we reach here without an error, treat it as success:
+      Swal.fire('Success!', 'Your inquiry has been submitted successfully.', 'success');
+      handleClose();
     } catch (error) {
       console.error('Error submitting inquiry:', error);
       Swal.fire('Error!', 'Failed to submit inquiry. Please try again.', 'error');
     }
   };
+  
 
   return (
     <Dialog
