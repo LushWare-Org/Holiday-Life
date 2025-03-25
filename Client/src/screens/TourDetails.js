@@ -99,7 +99,6 @@ const TourDetails = () => {
     fetchTourDetails();
   }, [id]); 
 
-  // Initialize selection defaults when tour data loads.
   useEffect(() => {
     if (tour) {
       // Initialize nights selection if available.
@@ -185,18 +184,18 @@ const TourDetails = () => {
             display: 'flex',
             flexDirection: isMobile ? 'column' : 'row',
             justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: 0,
+            alignItems: 'center',
+            gap: 6,
             mb: 2,
             padding: '0 40px',
           }}
         >
-          {/* LEFT COLUMN: Selections and Facilities */}
-          <Box sx={{ marginBottom: '30px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Left Column: Selections and Facilities */}
+          <Box sx={{ marginBottom: '30px' , display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
             {/* Nights selection */}
             {tour.nights && (
-              <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-                <Typography variant="h6" sx={{ mr: 2 }}>Select Nights:</Typography>
+              <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ mr: 2 }}>Nights</Typography>
                 {Object.keys(tour.nights).map((key) => (
                   <Box
                     key={key}
@@ -205,11 +204,12 @@ const TourDetails = () => {
                       setSelectedNightsOption(Object.keys(tour.nights[key])[0]);
                     }}
                     sx={{
-                      border: selectedNightsKey === key ? '2px solid blue' : '1px solid grey',
+                      border: selectedNightsKey === key ? '2px solid #2c69c9' : '1px solid grey',
+                      backgroundColor: selectedNightsKey === key ? 'rgba(0, 97, 252, 0.1)' : 'white',
                       borderRadius: 1,
                       p: 1,
                       mr: 1,
-                      cursor: 'pointer',
+                      cursor: 'pointer'
                     }}
                   >
                     <Typography>{key} Nights</Typography>
@@ -218,78 +218,78 @@ const TourDetails = () => {
               </Box>
             )}
 
-            {/* Package Options for chosen nights */}
+            <Divider style={{ margin: '0 0', color: 'black' }} />
+
+            {/* Option selection for chosen nights */}
             {selectedNightsKey && tour.nights[selectedNightsKey] && (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" sx={{ mb: 1 }}>
-                  Select Option for {selectedNightsKey} Nights:
-                </Typography>
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="h6" sx={{ mb: 1 }}>Package Options</Typography>
                 {Object.keys(tour.nights[selectedNightsKey]).map((optKey) => (
                   <Box
                     key={optKey}
                     onClick={() => setSelectedNightsOption(optKey)}
                     sx={{
-                      border: selectedNightsOption === optKey ? '2px solid blue' : '1px solid grey',
+                      border: selectedNightsOption === optKey ? '2px solid #2c69c9' : '1px solid grey',
+                      backgroundColor: selectedNightsOption === optKey ? 'rgba(0, 97, 252, 0.1)' : 'white',
                       borderRadius: 1,
                       p: 1,
                       mb: 1,
                       cursor: 'pointer',
-                      width: '100%',
+                      width: '100%'
                     }}
                   >
                     <Typography>
-                      {tour.nights[selectedNightsKey][optKey].option}{' '}
-                      <Typography component="span" sx={{ color: 'gray', ml: 1 }}>
-                        (+{selectedCurrency} {convertPrice(tour.nights[selectedNightsKey][optKey].add_price)})
-                      </Typography>
+                      {tour.nights[selectedNightsKey][optKey].option}
                     </Typography>
                   </Box>
                 ))}
               </Box>
             )}
 
-            {/* Food Category selection */}
+            <Divider style={{ margin: '0 0', color: 'black' }} />
+
+            {/* Food Category selection: Only display categories where boolean is true */}
             {tour.food_category && (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" sx={{ mb: 1 }}>Select Food Category:</Typography>
-                {Object.keys(tour.food_category)
-                  .filter((key) => tour.food_category[key][2] === true)
-                  .map((key) => (
-                    <Box
-                      key={key}
-                      onClick={() => setSelectedFoodCategory(key)}
-                      sx={{
-                        border: selectedFoodCategory === key ? '2px solid blue' : '1px solid grey',
-                        borderRadius: 1,
-                        p: 1,
-                        mb: 1,
-                        cursor: 'pointer',
-                        width: 'fit-content',
-                        minWidth: { xs: '100%', sm: 'auto' },
-                      }}
-                    >
-                      <Typography>
-                        {foodCategoryMap[key]}{' '}
-                        <Typography component="span" sx={{ color: 'gray', ml: 1 }}>
-                          (+{selectedCurrency} {convertPrice(tour.food_category[key][0])})
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Food Category
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, flexWrap: 'wrap' }}>
+                  {Object.keys(tour.food_category)
+                    .filter(key => tour.food_category[key][2] === true)
+                    .map((key) => (
+                      <Box
+                        key={key}
+                        onClick={() => setSelectedFoodCategory(key)}
+                        sx={{
+                          border: selectedFoodCategory === key ? '2px solid #2c69c9' : '1px solid grey',
+                          backgroundColor: selectedFoodCategory === key ? 'rgba(0, 97, 252, 0.1)' : 'white',
+                          borderRadius: 1,
+                          p: 1,
+                          cursor: 'pointer',
+                          width: 'fit-content',
+                        }}
+                      >
+                        <Typography>
+                          {foodCategoryMap[key]}
                         </Typography>
-                      </Typography>
-                    </Box>
+                      </Box>
                   ))}
+                </Box>
               </Box>
             )}
 
+            <Divider style={{ margin: '0 0', color: 'black' }} />
+
             {/* Facilities Div inserted under Food Category */}
             {tour.facilities && tour.facilities.length > 0 && (
-              <Box sx={{ mb: 2 }}>
+              <Box sx={{ mb: 2}}>
                 <Typography variant="h6" sx={{ mb: 1 }}>Facilities</Typography>
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-                    gap: 1,
-                  }}
-                >
+                <Box sx={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', 
+                  gap: 1 
+                }}>
                   {tour.facilities.map((facility, index) => (
                     <Box
                       key={index}
@@ -410,24 +410,22 @@ const TourDetails = () => {
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <DateRangeIcon sx={{ fontSize: 32, mr: 1 }} />
-                  <Typography variant="h5" sx={{ fontWeight: 500 }}>
-                    Valid Period
-                  </Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 500 }}>Valid Period</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 600 }}>
                     {new Date(tour.valid_from).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
-                      day: 'numeric',
+                      day: 'numeric'
                     })}
                   </Typography>
-                  -
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>to</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 600 }}>
                     {new Date(tour.valid_to).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
-                      day: 'numeric',
+                      day: 'numeric'
                     })}
                   </Typography>
                 </Box>
@@ -461,15 +459,6 @@ const TourDetails = () => {
             </Box>
           )}
         </Box>
-
-        {isMobile && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 5 }}>
-            {/* For mobile, you can keep your current mobile layout */}
-            {/* ... (Mobile-specific info cards omitted for brevity) ... */}
-          </Box>
-        )}
-
-        <Divider style={{ margin: '0 0' }} />
 
         {/* Tour Images */}
         {tour.tour_image && (
