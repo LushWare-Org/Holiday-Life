@@ -40,7 +40,7 @@ const sendAdminInquiryEmail = async ({
       ${tour ? `<p><strong>Tour ID:</strong> ${tour}</p>` : ''}
       ${final_price ? `<p><strong>Final Price:</strong> ${final_price}</p>` : ''}
       ${currency ? `<p><strong>Currency:</strong> ${currency}</p>` : ''}
-      ${selected_nights_key ? `<p><strong>Selected Nights Key:</strong> ${selected_nights_key}</p>` : ''}
+      ${selected_nights_key ? `<p><strong>Selected Nights:</strong> ${selected_nights_key}</p>` : ''}
       ${selected_nights_option ? `<p><strong>Selected Nights Option:</strong> ${selected_nights_option}</p>` : ''}
       ${selected_food_category ? `<p><strong>Selected Food Category:</strong> ${selected_food_category}</p>` : ''}
       <p><strong>Message:</strong></p>
@@ -82,7 +82,7 @@ const sendUserInquiryEmail = async ({
       ${tour ? `<p><strong>Tour ID:</strong> ${tour}</p>` : ''}
       ${final_price ? `<p><strong>Final Price:</strong> ${final_price}</p>` : ''}
       ${currency ? `<p><strong>Currency:</strong> ${currency}</p>` : ''}
-      ${selected_nights_key ? `<p><strong>Selected Nights Key:</strong> ${selected_nights_key}</p>` : ''}
+      ${selected_nights_key ? `<p><strong>Selected Nights:</strong> ${selected_nights_key}</p>` : ''}
       ${selected_nights_option ? `<p><strong>Selected Nights Option:</strong> ${selected_nights_option}</p>` : ''}
       ${selected_food_category ? `<p><strong>Selected Food Category:</strong> ${selected_food_category}</p>` : ''}
       <p><strong>Message:</strong></p>
