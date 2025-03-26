@@ -23,7 +23,7 @@ transporter.verify((error, success) => {
   if (error) {
     console.error('SMTP verification error:', error);
   } else {
-    console.log('SMTP server ready to take our messages');
+    console.log('SMTP server is ready to send emails');
   }
 });
 
@@ -59,14 +59,14 @@ const sendInquiryEmail = async ({
     `;
 
   const mailOptionsAdmin = {
-    from: 'Holiday Life <sales@holidaylife.travel>',
+    from: '"Holiday Life" <sales@holidaylife.travel>',
     to: 'sales@holidaylife.travel',
     subject: `New Inquiry from ${name}`,
     html: htmlContent,
   };
 
   const mailOptionsUser = {
-    from: 'Holiday Life <sales@holidaylife.travel>',
+    from: '"Holiday Life" <sales@holidaylife.travel>',
     to: email,
     subject: 'Thank you for your inquiry!',
     html: `

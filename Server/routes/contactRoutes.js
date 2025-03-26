@@ -23,11 +23,11 @@ transporter.verify((error, success) => {
   if (error) {
     console.error('SMTP verification error:', error);
   } else {
-    console.log('SMTP server ready to take our messages');
+    console.log('SMTP server is ready to send emails');
   }
 });
 
-// Helper function to send inquiry email to both admin and user
+// Helper function to send inquiry emails (to user and admin)
 const sendContactEmail = async ({ name, email, message }) => {
   const htmlContent = `
       <p>You have a new contact inquiry:</p>
@@ -38,7 +38,7 @@ const sendContactEmail = async ({ name, email, message }) => {
     `;
     
   const mailOptionsUser = {
-    from: 'Holiday Life <sales@holidaylife.travel>',
+    from: '"Holiday Life" <sales@holidaylife.travel>',
     to: email, 
     subject: `New Contact Inquiry from ${name}`,
     text: message,
@@ -46,7 +46,7 @@ const sendContactEmail = async ({ name, email, message }) => {
   };
 
   const mailOptionsAdmin = {
-    from: 'Holiday Life <sales@holidaylife.travel>',
+    from: '"Holiday Life" <sales@holidaylife.travel>',
     to: 'sales@holidaylife.travel',
     subject: `New Contact Inquiry from ${name}`,
     text: message,
