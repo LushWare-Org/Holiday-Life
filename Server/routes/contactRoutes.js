@@ -10,12 +10,9 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER || 'sales@holidaylife.travel',
-    pass: process.env.EMAIL_PASS || 'Sales@holi_997',
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
+    user: 'sales@holidaylife.travel',
+    pass: 'Sales@holi_997',
+  }
 });
 
 // Verify the SMTP connection
