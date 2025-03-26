@@ -15,16 +15,8 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Verify the SMTP connection
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('SMTP verification error:', error);
-  } else {
-    console.log('SMTP server is ready to send emails');
-  }
-});
-
-const sendInquiryEmail = async ({
+// Function to send admin email
+const sendAdminInquiryEmail = async ({
   name,
   email,
   phone_number,
@@ -62,6 +54,41 @@ const sendInquiryEmail = async ({
     html: htmlContent,
   };
 
+  return transporter.sendMail(mailOptionsAdmin);
+};
+
+// Function to send user email
+const sendUserInquiryEmail = async ({
+  name,
+  email,
+  phone_number,
+  travel_date,
+  traveller_count,
+  message,
+  tour,
+  final_price,
+  currency,
+  selected_nights_key,
+  selected_nights_option,
+  selected_food_category
+}) => {
+  const htmlContent = `
+      <h2>New Travel Inquiry</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone_number}</p>
+      <p><strong>Travel Date:</strong> ${travel_date}</p>
+      <p><strong>Traveller Count:</strong> ${traveller_count}</p>
+      ${tour ? `<p><strong>Tour ID:</strong> ${tour}</p>` : ''}
+      ${final_price ? `<p><strong>Final Price:</strong> ${final_price}</p>` : ''}
+      ${currency ? `<p><strong>Currency:</strong> ${currency}</p>` : ''}
+      ${selected_nights_key ? `<p><strong>Selected Nights Key:</strong> ${selected_nights_key}</p>` : ''}
+      ${selected_nights_option ? `<p><strong>Selected Nights Option:</strong> ${selected_nights_option}</p>` : ''}
+      ${selected_food_category ? `<p><strong>Selected Food Category:</strong> ${selected_food_category}</p>` : ''}
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `;
+
   const mailOptionsUser = {
     from: '"Holiday Life" <sales@holidaylife.travel>',
     to: email,
@@ -74,12 +101,10 @@ const sendInquiryEmail = async ({
     `,
   };
 
-  // Send both emails concurrently
-  await Promise.all([
-    transporter.sendMail(mailOptionsAdmin),
-    transporter.sendMail(mailOptionsUser)
-  ]);
+  return transporter.sendMail(mailOptionsUser);
 };
+
+
 
 // POST / - Save inquiry and send emails
 router.post('/', async (req, res) => {
@@ -119,20 +144,37 @@ router.post('/', async (req, res) => {
     });
     await newInquiry.save();
 
-    await sendInquiryEmail({
-      name,
-      email,
-      phone_number,
-      travel_date,
-      traveller_count,
-      message,
-      tour,
-      final_price,
-      currency,
-      selected_nights_key,
-      selected_nights_option,
-      selected_food_category
-    });
+    await Promise.all([
+      sendAdminInquiryEmail({
+        name,
+        email,
+        phone_number,
+        travel_date,
+        traveller_count,
+        message,
+        tour,
+        final_price,
+        currency,
+        selected_nights_key,
+        selected_nights_option,
+        selected_food_category
+      }),
+
+      sendUserInquiryEmail({
+        name,
+        email,
+        phone_number,
+        travel_date,
+        traveller_count,
+        message,
+        tour,
+        final_price,
+        currency,
+        selected_nights_key,
+        selected_nights_option,
+        selected_food_category
+      })
+    ]);
 
     res.status(201).json({ message: 'Inquiry submitted successfully!', inquiry: newInquiry });
   } catch (error) {

@@ -15,17 +15,8 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Verify the SMTP connection
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('SMTP verification error:', error);
-  } else {
-    console.log('SMTP server is ready to send emails');
-  }
-});
-
-// Helper function to send inquiry emails (to user and admin)
-const sendContactEmail = async ({ name, email, message }) => {
+// Function to send email to the user
+const sendContactUserEmail = async ({ name, email, message }) => {
   const htmlContent = `
       <p>You have a new contact inquiry:</p>
       <p><strong>Name:</strong> ${name}</p>
@@ -42,6 +33,19 @@ const sendContactEmail = async ({ name, email, message }) => {
     html: htmlContent,
   };
 
+  return transporter.sendMail(mailOptionsUser);
+};
+
+// Function to send email to the admin
+const sendContactAdminEmail = async ({ name, email, message }) => {
+  const htmlContent = `
+      <p>You have a new contact inquiry:</p>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `;
+    
   const mailOptionsAdmin = {
     from: '"Holiday Life" <sales@holidaylife.travel>',
     to: 'sales@holidaylife.travel',
@@ -50,11 +54,7 @@ const sendContactEmail = async ({ name, email, message }) => {
     html: htmlContent,
   };
 
-  // Send both emails concurrently
-  await Promise.all([
-    transporter.sendMail(mailOptionsUser),
-    transporter.sendMail(mailOptionsAdmin)
-  ]);
+  return transporter.sendMail(mailOptionsAdmin);
 };
 
 // POST / - Save contact submission and send emails
@@ -68,9 +68,11 @@ router.post('/', async (req, res) => {
   try {
     const newSubmission = new ContactSubmission({ name, email, message });
     await newSubmission.save();
-
-    // Send email notification
-    await sendContactEmail({ name, email, message });
+    
+    await Promise.all([
+      sendContactUserEmail({ name, email, message }),
+      sendContactAdminEmail({ name, email, message }),
+    ]);
 
     res.status(200).json({ success: true, message: 'Thank you for contacting us! We have received your message.' });
   } catch (error) {
