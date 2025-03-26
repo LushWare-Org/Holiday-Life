@@ -189,3 +189,13 @@ router.post('/reply', async (req, res) => {
         message: replyMessage,
         sentAt: new Date(),
       },
+    });
+
+    res.status(200).json({ message: 'Reply sent successfully.' });
+  } catch (error) {
+    console.error('Error sending reply:', error);
+    res.status(500).json({ message: 'Failed to send reply.', error: error.message });
+  }
+});
+
+module.exports = router;
