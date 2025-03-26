@@ -6,12 +6,12 @@ require('dotenv').config();
 
 // Configure transporter with TLS options
 const transporter = nodemailer.createTransport({
-  host: 'smtp.hostinger.com',
+  host: 'smtp.gmail.com',
   port: 587,
   secure: false,
   auth: {
-    user: 'sales@holidaylife.travel',
-    pass: 'Sales@holi_997',
+    user: 'nharithmaduranga@gmail.com',
+    pass: 'tjok swcn hugs tnpq',
   }
 });
 
@@ -68,7 +68,7 @@ router.post('/', async (req, res) => {
   try {
     const newSubmission = new ContactSubmission({ name, email, message });
     await newSubmission.save();
-    
+
     await Promise.all([
       sendContactUserEmail({ name, email, message }),
       sendContactAdminEmail({ name, email, message }),
