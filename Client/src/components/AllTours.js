@@ -677,7 +677,25 @@ const AllTours = () => {
       Swal.fire("Error", error.message, "error");
     }
   };
-  
+
+  // Duplicate a tour.
+  const handleDuplicate = async (tour) => {
+    try {
+      // Destructure _id out of the tour and keep the rest of the data.
+      const { _id, ...duplicateData } = tour;
+      // Send a POST request to create a new tour.
+      const response = await axios.post("/tours", duplicateData);
+      if (response.status === 201) {
+        setTours([...tours, response.data]);
+        Swal.fire("Success!", "Tour duplicated successfully.", "success");
+      } else {
+        throw new Error("Failed to duplicate tour.");
+      }
+    } catch (error) {
+      console.error("Error duplicating tour:", error);
+      Swal.fire("Error", error.message, "error");
+    }
+  };
 
   return (
     <div className="bg-white min-h-screen p-0">
@@ -695,12 +713,18 @@ const AllTours = () => {
           />
             <div className="p-4 text-center">
               <h3 className="text-xl font-semibold">{tour.title}</h3>
-              <div className="mt-4 flex justify-center space-x-4">
+              <div className="mt-4 flex justify-center space-x-2">
                 <button
-                  className="bg-blue-500 text-white px-4 py-2 min-w-48 rounded hover:bg-blue-600"
+                  className="bg-blue-500 text-white w-full  px-4 py-2 rounded hover:bg-blue-600"
                   onClick={() => handleEditOpen(tour)}
                 >
                   Edit
+                </button>
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  onClick={() => handleDuplicate(tour)}
+                >
+                  Duplicate
                 </button>
                 <button
                   className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
