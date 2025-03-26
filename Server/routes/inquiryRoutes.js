@@ -32,13 +32,28 @@ const sendInquiryEmail = async ({ name, email, phone_number, travel_date, travel
       <p>${message}</p>
     `;
   const mailOptions = {
-    from: email, // "John Doe" <john@gmail.com>
+    from: 'Holiday Life <sales@holidaylife.travel>',
     to: 'sales@holidaylife.travel',    // admin email from your .env or another email
     subject: `New Inquiry from ${name}`,
     html: htmlContent,
   };
 
-  return transporter.sendMail(mailOptions);
+  const mailToUser = {  
+    from: 'Holiday Life <sales@holidaylife.travel>',
+    to: email,
+    subject: 'Thank you for your inquiry!',
+    html: `
+      <h2>Thank you for your inquiry, ${name}!</h2>
+      <p>We have received your inquiry and will get back to you shortly.</p>
+      <p>Here are the details you provided:</p>
+      ${htmlContent}
+    `,
+  };
+
+  // Await the first email
+  await transporter.sendMail(mailOptions);
+  // Then send the second email
+  await transporter.sendMail(mailToUser);
 };
 
 // POST /api/inquiries

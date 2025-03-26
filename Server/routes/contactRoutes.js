@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 // Helper function to send inquiry email to Admin
 const sendContactEmail = async ({ name, email, message }) => {
   const mailOptions = {
-    from: 'sales@holidaylife.travel',
+    from: 'Holiday Life <sales@holidaylife.travel>',
     to: email, 
     subject: `New Contact Inquiry from ${name}`,
     text: message, 
@@ -30,7 +30,23 @@ const sendContactEmail = async ({ name, email, message }) => {
     `,
   };
 
-  return transporter.sendMail(mailOptions); 
+  const mailToHost = {
+    from: 'Holiday Life <sales@holidaylife.travel>',
+    to : 'sales@holidaylife.travel',
+    subject: `New Contact Inquiry from ${name}`,
+    text: message,
+    html: `
+      <p>You have a new contact inquiry:</p>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `,
+  };  
+
+  await transporter.sendMail(mailOptions);
+  await transporter.sendMail(mailToHost);
+   
 };
 
 router.post('/', async (req, res) => {
