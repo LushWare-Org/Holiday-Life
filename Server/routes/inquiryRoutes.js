@@ -2,19 +2,45 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const Inquiry = require('../models/inquirySubmission'); // Path to your Inquiry model
 const router = express.Router();
-require('dotenv').config(); 
+require('dotenv').config();
 
+// Configure transporter with TLS options
 const transporter = nodemailer.createTransport({
   host: 'smtp.hostinger.com',
   port: 587,
   secure: false,
   auth: {
-    user: 'sales@holidaylife.travel',
-    pass: 'Sales@holi_997',
+    user: process.env.EMAIL_USER || 'sales@holidaylife.travel',
+    pass: process.env.EMAIL_PASS || 'Sales@holi_997',
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
-const sendInquiryEmail = async ({ name, email, phone_number, travel_date, traveller_count, message, tour, final_price, currency, selected_nights_key, selected_nights_option, selected_food_category }) => {
+// Verify the SMTP connection
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('SMTP verification error:', error);
+  } else {
+    console.log('SMTP server ready to take our messages');
+  }
+});
+
+const sendInquiryEmail = async ({
+  name,
+  email,
+  phone_number,
+  travel_date,
+  traveller_count,
+  message,
+  tour,
+  final_price,
+  currency,
+  selected_nights_key,
+  selected_nights_option,
+  selected_food_category
+}) => {
   const htmlContent = `
       <h2>New Travel Inquiry</h2>
       <p><strong>Name:</strong> ${name}</p>
@@ -31,14 +57,15 @@ const sendInquiryEmail = async ({ name, email, phone_number, travel_date, travel
       <p><strong>Message:</strong></p>
       <p>${message}</p>
     `;
-  const mailOptions = {
+
+  const mailOptionsAdmin = {
     from: 'Holiday Life <sales@holidaylife.travel>',
-    to: 'sales@holidaylife.travel',    // admin email from your .env or another email
+    to: 'sales@holidaylife.travel',
     subject: `New Inquiry from ${name}`,
     html: htmlContent,
   };
 
-  const mailToUser = {  
+  const mailOptionsUser = {
     from: 'Holiday Life <sales@holidaylife.travel>',
     to: email,
     subject: 'Thank you for your inquiry!',
@@ -50,26 +77,65 @@ const sendInquiryEmail = async ({ name, email, phone_number, travel_date, travel
     `,
   };
 
-  // Await the first email
-  await transporter.sendMail(mailOptions);
-  // Then send the second email
-  await transporter.sendMail(mailToUser);
+  // Send both emails concurrently
+  await Promise.all([
+    transporter.sendMail(mailOptionsAdmin),
+    transporter.sendMail(mailOptionsUser)
+  ]);
 };
 
-// POST /api/inquiries
-// Create a new inquiry + send email
+// POST / - Save inquiry and send emails
 router.post('/', async (req, res) => {
-  const { name, email, phone_number, travel_date, traveller_count, message, tour,  final_price, currency, selected_nights_key, selected_nights_option, selected_food_category } = req.body;
+  const {
+    name,
+    email,
+    phone_number,
+    travel_date,
+    traveller_count,
+    message,
+    tour,
+    final_price,
+    currency,
+    selected_nights_key,
+    selected_nights_option,
+    selected_food_category
+  } = req.body;
 
   if (!name || !email || !phone_number || !travel_date || !traveller_count) {
     return res.status(400).json({ message: 'Missing required fields. Please fill them all.' });
   }
 
   try {
-    const newInquiry = new Inquiry({ name, email, phone_number, travel_date, traveller_count, message, tour, final_price, currency, selected_nights_key, selected_nights_option, selected_food_category, });
+    const newInquiry = new Inquiry({
+      name,
+      email,
+      phone_number,
+      travel_date,
+      traveller_count,
+      message,
+      tour,
+      final_price,
+      currency,
+      selected_nights_key,
+      selected_nights_option,
+      selected_food_category,
+    });
     await newInquiry.save();
 
-    await sendInquiryEmail({ name, email, phone_number, travel_date, traveller_count,tour, selected_food_category, selected_nights_key, selected_nights_option, message });
+    await sendInquiryEmail({
+      name,
+      email,
+      phone_number,
+      travel_date,
+      traveller_count,
+      message,
+      tour,
+      final_price,
+      currency,
+      selected_nights_key,
+      selected_nights_option,
+      selected_food_category
+    });
 
     res.status(201).json({ message: 'Inquiry submitted successfully!', inquiry: newInquiry });
   } catch (error) {
@@ -78,7 +144,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/inquiries
+// GET / - Fetch all inquiries
 router.get('/', async (req, res) => {
   try {
     const inquiries = await Inquiry.find({});
@@ -88,7 +154,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// DELETE /api/inquiries/:id
+// DELETE /:id - Delete a specific inquiry
 router.delete('/:id', async (req, res) => {
   try {
     const removed = await Inquiry.findByIdAndDelete(req.params.id);
@@ -99,7 +165,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// POST /api/inquiries/reply
+// POST /reply - Reply to an inquiry
 router.post('/reply', async (req, res) => {
   const { inquiryId, email, subject, replyMessage } = req.body;
 
@@ -115,7 +181,7 @@ router.post('/reply', async (req, res) => {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 
     await Inquiry.findByIdAndUpdate(inquiryId, {
       reply: {
@@ -123,13 +189,3 @@ router.post('/reply', async (req, res) => {
         message: replyMessage,
         sentAt: new Date(),
       },
-    });
-
-    res.status(200).json({ message: 'Reply sent successfully.' });
-  } catch (error) {
-    console.error('Error sending reply:', error);
-    res.status(500).json({ message: 'Failed to send reply.', error: error.message });
-  }
-});
-
-module.exports = router;

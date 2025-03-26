@@ -2,53 +2,65 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const ContactSubmission = require('../models/ContactSubmission'); 
 const router = express.Router();
-require('dotenv').config(); 
+require('dotenv').config();
 
+// Configure transporter with TLS options
 const transporter = nodemailer.createTransport({
   host: 'smtp.hostinger.com',
   port: 587,
   secure: false,
   auth: {
-    user: 'sales@holidaylife.travel',
-    pass: 'Sales@holi_997',
+    user: process.env.EMAIL_USER || 'sales@holidaylife.travel',
+    pass: process.env.EMAIL_PASS || 'Sales@holi_997',
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
-// Helper function to send inquiry email to Admin
+// Verify the SMTP connection
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('SMTP verification error:', error);
+  } else {
+    console.log('SMTP server ready to take our messages');
+  }
+});
+
+// Helper function to send inquiry email to both admin and user
 const sendContactEmail = async ({ name, email, message }) => {
-  const mailOptions = {
+  const htmlContent = `
+      <p>You have a new contact inquiry:</p>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `;
+    
+  const mailOptionsUser = {
     from: 'Holiday Life <sales@holidaylife.travel>',
     to: email, 
     subject: `New Contact Inquiry from ${name}`,
-    text: message, 
-    html: `
-      <p>You have a new contact inquiry:</p>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Message:</strong></p>
-      <p>${message}</p>
-    `,
+    text: message,
+    html: htmlContent,
   };
 
-  const mailToHost = {
+  const mailOptionsAdmin = {
     from: 'Holiday Life <sales@holidaylife.travel>',
-    to : 'sales@holidaylife.travel',
+    to: 'sales@holidaylife.travel',
     subject: `New Contact Inquiry from ${name}`,
     text: message,
-    html: `
-      <p>You have a new contact inquiry:</p>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Message:</strong></p>
-      <p>${message}</p>
-    `,
-  };  
+    html: htmlContent,
+  };
 
-  await transporter.sendMail(mailOptions);
-  await transporter.sendMail(mailToHost);
-   
+  // Send both emails concurrently
+  await Promise.all([
+    transporter.sendMail(mailOptionsUser),
+    transporter.sendMail(mailOptionsAdmin)
+  ]);
 };
 
+// POST / - Save contact submission and send emails
 router.post('/', async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -66,11 +78,11 @@ router.post('/', async (req, res) => {
     res.status(200).json({ success: true, message: 'Thank you for contacting us! We have received your message.' });
   } catch (error) {
     console.error('Error processing contact form:', error);
-    res.status(500).json({ success:false, message: 'Error: Unable to submit your message.', error: error });
+    res.status(500).json({ success: false, message: 'Error: Unable to submit your message.', error: error.message });
   }
 });
 
-// Fetch all contact inquiries
+// GET /inquiries - Fetch all contact inquiries
 router.get('/inquiries', async (req, res) => {
   try {
     const inquiries = await ContactSubmission.find().sort({ submittedAt: -1 });
@@ -81,7 +93,7 @@ router.get('/inquiries', async (req, res) => {
   }
 });
 
-// Delete a specific inquiry by ID
+// DELETE /inquiries/:id - Delete a specific inquiry by ID
 router.delete('/inquiries/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -97,7 +109,7 @@ router.delete('/inquiries/:id', async (req, res) => {
   }
 });
 
-// Reply to an inquiry
+// POST /reply - Reply to an inquiry
 router.post('/reply', async (req, res) => {
   const { email, subject, replyMessage, inquiryId } = req.body;
 
@@ -111,11 +123,9 @@ router.post('/reply', async (req, res) => {
     subject,
     text: replyMessage,
   };
-  
 
   try {
-    // Send the reply email
-    const info = await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 
     await ContactSubmission.findByIdAndUpdate(inquiryId, {
       reply: {
