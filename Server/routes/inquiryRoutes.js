@@ -4,14 +4,13 @@ const Inquiry = require('../models/inquirySubmission'); // Path to your Inquiry 
 const router = express.Router();
 require('dotenv').config();
 
-// Configure transporter with TLS options
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   secure: false,
   auth: {
-    user: 'nharithmaduranga@gmail.com',
-    pass: 'tjok swcn hugs tnpq',
+    user: 'samirsaeedh@gmail.com',
+    pass: 'spur wgyt dzte crms',
   }
 });
 
