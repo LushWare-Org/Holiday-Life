@@ -453,9 +453,12 @@ const AllTours = () => {
 
   const handleImageUpload = async (e, key, section) => {
     const files = Array.from(e.target.files);
+    
     for (const file of files) {
-      // Step 1: Generate and set a temporary loading URL
+      // 1) Generate a temporary blob URL for instant preview
       const loadingUrl = URL.createObjectURL(file);
+      
+      // 2) Put that blob URL in state so user sees immediate preview
       if (section === "middle_days" && key) {
         setFormData((prev) => ({
           ...prev,
@@ -467,12 +470,18 @@ const AllTours = () => {
             },
           },
         }));
-      } else if (["tour_image", "destination_images", "activity_images", "hotel_images"].includes(section)) {
+      } else if (
+        section === "tour_image" ||
+        section === "destination_images" ||
+        section === "activity_images" ||
+        section === "hotel_images"
+      ) {
         setFormData((prev) => ({
           ...prev,
           [section]: [...prev[section], loadingUrl],
         }));
       } else {
+        // first_day or last_day
         setFormData((prev) => ({
           ...prev,
           itineraryImages: {
@@ -482,19 +491,26 @@ const AllTours = () => {
         }));
       }
   
-      // Step 2: Upload the image to imgbb
+      // 3) Upload the file to imgbb
       try {
         const formDataToSend = new FormData();
         formDataToSend.append("image", file);
-        const response = await fetch(
-          "https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39",
-          { method: "POST", body: formDataToSend }
-        );
-        if (!response.ok) throw new Error(`Failed to upload image: ${response.statusText}`);
-        const data = await response.json();
-        const finalUrl = data.data.url;
   
-        // Step 3: Replace loadingUrl with finalUrl in state
+        // Use axios
+        const response = await axios.post(
+          "https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39",
+          formDataToSend,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+  
+        if (response.status !== 200) {
+          throw new Error(`Failed to upload image. Status: ${response.status}`);
+        }
+  
+        // 4) finalUrl is the persistent link from imgbb
+        const finalUrl = response.data.data.url;
+  
+        // 5) Replace the blob: URL with finalUrl in state
         if (section === "middle_days" && key) {
           setFormData((prev) => ({
             ...prev,
@@ -508,10 +524,17 @@ const AllTours = () => {
               },
             },
           }));
-        } else if (["tour_image", "destination_images", "activity_images", "hotel_images"].includes(section)) {
+        } else if (
+          section === "tour_image" ||
+          section === "destination_images" ||
+          section === "activity_images" ||
+          section === "hotel_images"
+        ) {
           setFormData((prev) => ({
             ...prev,
-            [section]: prev[section].map((url) => (url === loadingUrl ? finalUrl : url)),
+            [section]: prev[section].map((url) =>
+              url === loadingUrl ? finalUrl : url
+            ),
           }));
         } else {
           setFormData((prev) => ({
