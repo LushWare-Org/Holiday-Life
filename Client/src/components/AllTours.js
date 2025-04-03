@@ -451,63 +451,50 @@ const AllTours = () => {
     }
   };
 
-  // ============ Image Upload & Remove ============
   const handleImageUpload = async (e, key, section) => {
     const files = Array.from(e.target.files);
     for (const file of files) {
-      const previewUrl = URL.createObjectURL(file);
-
+      // Step 1: Generate and set a temporary loading URL
+      const loadingUrl = URL.createObjectURL(file);
       if (section === "middle_days" && key) {
-        // Middle days images
         setFormData((prev) => ({
           ...prev,
           itineraryImages: {
             ...prev.itineraryImages,
             middle_days: {
               ...prev.itineraryImages.middle_days,
-              [key]: [...(prev.itineraryImages.middle_days[key] || []), previewUrl],
+              [key]: [...(prev.itineraryImages.middle_days[key] || []), loadingUrl],
             },
           },
         }));
-      } else if (
-        section === "tour_image" ||
-        section === "destination_images" ||
-        section === "activity_images" ||
-        section === "hotel_images"
-      ) {
-        // Generic top-level images
+      } else if (["tour_image", "destination_images", "activity_images", "hotel_images"].includes(section)) {
         setFormData((prev) => ({
           ...prev,
-          [section]: [...prev[section], previewUrl],
+          [section]: [...prev[section], loadingUrl],
         }));
       } else {
-        // first_day / last_day images
         setFormData((prev) => ({
           ...prev,
           itineraryImages: {
             ...prev.itineraryImages,
-            [key]: [...prev.itineraryImages[key], previewUrl],
+            [key]: [...(prev.itineraryImages[key] || []), loadingUrl],
           },
         }));
       }
-
+  
+      // Step 2: Upload the image to imgbb
       try {
         const formDataToSend = new FormData();
         formDataToSend.append("image", file);
-        const response = await axios.post(
+        const response = await fetch(
           "https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39",
-          formDataToSend,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
+          { method: "POST", body: formDataToSend }
         );
-        if (!response.ok) {
-          throw new Error(`Failed to upload image: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`Failed to upload image: ${response.statusText}`);
         const data = await response.json();
         const finalUrl = data.data.url;
-
-        // Replace preview with final URL
+  
+        // Step 3: Replace loadingUrl with finalUrl in state
         if (section === "middle_days" && key) {
           setFormData((prev) => ({
             ...prev,
@@ -516,20 +503,15 @@ const AllTours = () => {
               middle_days: {
                 ...prev.itineraryImages.middle_days,
                 [key]: prev.itineraryImages.middle_days[key].map((url) =>
-                  url === previewUrl ? finalUrl : url
+                  url === loadingUrl ? finalUrl : url
                 ),
               },
             },
           }));
-        } else if (
-          section === "tour_image" ||
-          section === "destination_images" ||
-          section === "activity_images" ||
-          section === "hotel_images"
-        ) {
+        } else if (["tour_image", "destination_images", "activity_images", "hotel_images"].includes(section)) {
           setFormData((prev) => ({
             ...prev,
-            [section]: prev[section].map((url) => (url === previewUrl ? finalUrl : url)),
+            [section]: prev[section].map((url) => (url === loadingUrl ? finalUrl : url)),
           }));
         } else {
           setFormData((prev) => ({
@@ -537,7 +519,7 @@ const AllTours = () => {
             itineraryImages: {
               ...prev.itineraryImages,
               [key]: prev.itineraryImages[key].map((url) =>
-                url === previewUrl ? finalUrl : url
+                url === loadingUrl ? finalUrl : url
               ),
             },
           }));
@@ -547,40 +529,7 @@ const AllTours = () => {
       }
     }
   };
-
-  const handleRemoveImage = (key, index, section) => {
-    if (section === "middle_days" && key) {
-      setFormData((prev) => ({
-        ...prev,
-        itineraryImages: {
-          ...prev.itineraryImages,
-          middle_days: {
-            ...prev.itineraryImages.middle_days,
-            [key]: prev.itineraryImages.middle_days[key].filter((_, i) => i !== index),
-          },
-        },
-      }));
-    } else if (
-      section === "tour_image" ||
-      section === "destination_images" ||
-      section === "activity_images" ||
-      section === "hotel_images"
-    ) {
-      setFormData((prev) => ({
-        ...prev,
-        [section]: prev[section].filter((_, i) => i !== index),
-      }));
-    } else {
-      // first_day / last_day
-      setFormData((prev) => ({
-        ...prev,
-        itineraryImages: {
-          ...prev.itineraryImages,
-          [key]: prev.itineraryImages[key].filter((_, i) => i !== index),
-        },
-      }));
-    }
-  };
+  
 
   // Save (update) the tour.
   const handleSave = async () => {
