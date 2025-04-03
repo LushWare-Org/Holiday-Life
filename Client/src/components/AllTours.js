@@ -453,105 +453,107 @@ const AllTours = () => {
 
   const handleImageUpload = async (e, key, section) => {
     const files = Array.from(e.target.files);
-    
+
     for (const file of files) {
-      // 1) Generate a temporary blob URL for instant preview
-      const loadingUrl = URL.createObjectURL(file);
-      
-      // 2) Put that blob URL in state so user sees immediate preview
-      if (section === "middle_days" && key) {
-        setFormData((prev) => ({
-          ...prev,
-          itineraryImages: {
-            ...prev.itineraryImages,
-            middle_days: {
-              ...prev.itineraryImages.middle_days,
-              [key]: [...(prev.itineraryImages.middle_days[key] || []), loadingUrl],
-            },
-          },
-        }));
-      } else if (
-        section === "tour_image" ||
-        section === "destination_images" ||
-        section === "activity_images" ||
-        section === "hotel_images"
-      ) {
-        setFormData((prev) => ({
-          ...prev,
-          [section]: [...prev[section], loadingUrl],
-        }));
-      } else {
-        // first_day or last_day
-        setFormData((prev) => ({
-          ...prev,
-          itineraryImages: {
-            ...prev.itineraryImages,
-            [key]: [...(prev.itineraryImages[key] || []), loadingUrl],
-          },
-        }));
-      }
-  
-      // 3) Upload the file to imgbb
-      try {
-        const formDataToSend = new FormData();
-        formDataToSend.append("image", file);
-  
-        // Use axios
-        const response = await axios.post(
-          "https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39",
-          formDataToSend,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-  
-        if (response.status !== 200) {
-          throw new Error(`Failed to upload image. Status: ${response.status}`);
-        }
-  
-        // 4) finalUrl is the persistent link from imgbb
-        const finalUrl = response.data.data.url;
-  
-        // 5) Replace the blob: URL with finalUrl in state
+        // 1) Generate a temporary blob URL for instant preview
+        const loadingUrl = URL.createObjectURL(file);
+
+        // 2) Put that blob URL in state so user sees immediate preview
         if (section === "middle_days" && key) {
-          setFormData((prev) => ({
-            ...prev,
-            itineraryImages: {
-              ...prev.itineraryImages,
-              middle_days: {
-                ...prev.itineraryImages.middle_days,
-                [key]: prev.itineraryImages.middle_days[key].map((url) =>
-                  url === loadingUrl ? finalUrl : url
-                ),
-              },
-            },
-          }));
+            setFormData((prev) => ({
+                ...prev,
+                itineraryImages: {
+                    ...prev.itineraryImages,
+                    middle_days: {
+                        ...prev.itineraryImages.middle_days,
+                        [key]: [...(prev.itineraryImages.middle_days[key] || []), loadingUrl],
+                    },
+                },
+            }));
         } else if (
-          section === "tour_image" ||
-          section === "destination_images" ||
-          section === "activity_images" ||
-          section === "hotel_images"
+            section === "tour_image" ||
+            section === "destination_images" ||
+            section === "activity_images" ||
+            section === "hotel_images"
         ) {
-          setFormData((prev) => ({
-            ...prev,
-            [section]: prev[section].map((url) =>
-              url === loadingUrl ? finalUrl : url
-            ),
-          }));
+            setFormData((prev) => ({
+                ...prev,
+                [section]: [...prev[section], loadingUrl],
+            }));
         } else {
-          setFormData((prev) => ({
-            ...prev,
-            itineraryImages: {
-              ...prev.itineraryImages,
-              [key]: prev.itineraryImages[key].map((url) =>
-                url === loadingUrl ? finalUrl : url
-              ),
-            },
-          }));
+            // For first_day or last_day
+            setFormData((prev) => ({
+                ...prev,
+                itineraryImages: {
+                    ...prev.itineraryImages,
+                    [key]: [...(prev.itineraryImages[key] || []), loadingUrl],
+                },
+            }));
         }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-      }
+
+        // 3) Upload the file to imgbb
+        try {
+            const formDataToSend = new FormData();
+            formDataToSend.append("image", file);
+
+            // Use axios
+            const response = await axios.post(
+                "https://api.imgbb.com/1/upload?key=4e08e03047ee0d48610586ad270e2b39",
+                formDataToSend,
+                { headers: { "Content-Type": "multipart/form-data" } }
+            );
+
+            if (response.status !== 200) {
+                throw new Error(`Failed to upload image. Status: ${response.status}`);
+            }
+
+            // Use the response data directly
+            const data = response.data;
+            const uploadedUrl = data.data.url;
+
+            // 4) Replace the blob URL with the uploaded URL in state
+            if (section === "middle_days" && key) {
+                setFormData((prev) => ({
+                    ...prev,
+                    itineraryImages: {
+                        ...prev.itineraryImages,
+                        middle_days: {
+                            ...prev.itineraryImages.middle_days,
+                            [key]: prev.itineraryImages.middle_days[key].map((url) =>
+                                url === loadingUrl ? uploadedUrl : url
+                            ),
+                        },
+                    },
+                }));
+            } else if (
+                section === "tour_image" ||
+                section === "destination_images" ||
+                section === "activity_images" ||
+                section === "hotel_images"
+            ) {
+                setFormData((prev) => ({
+                    ...prev,
+                    [section]: prev[section].map((url) =>
+                        url === loadingUrl ? uploadedUrl : url
+                    ),
+                }));
+            } else {
+                setFormData((prev) => ({
+                    ...prev,
+                    itineraryImages: {
+                        ...prev.itineraryImages,
+                        [key]: prev.itineraryImages[key].map((url) =>
+                            url === loadingUrl ? uploadedUrl : url
+                        ),
+                    },
+                }));
+            }
+
+        } catch (error) {
+            console.error("Error uploading image:", error);
+        }
     }
-  };
+};
   
   const handleRemoveImage = (key, index, section) => {
     if (section === "middle_days" && key) {
