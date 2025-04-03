@@ -530,6 +530,39 @@ const AllTours = () => {
     }
   };
   
+  const handleRemoveImage = (key, index, section) => {
+    if (section === "middle_days" && key) {
+      setFormData((prev) => ({
+        ...prev,
+        itineraryImages: {
+          ...prev.itineraryImages,
+          middle_days: {
+            ...prev.itineraryImages.middle_days,
+            [key]: prev.itineraryImages.middle_days[key].filter((_, i) => i !== index),
+          },
+        },
+      }));
+    } else if (
+      section === "tour_image" ||
+      section === "destination_images" ||
+      section === "activity_images" ||
+      section === "hotel_images"
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        [section]: prev[section].filter((_, i) => i !== index),
+      }));
+    } else {
+      // first_day / last_day
+      setFormData((prev) => ({
+        ...prev,
+        itineraryImages: {
+          ...prev.itineraryImages,
+          [key]: prev.itineraryImages[key].filter((_, i) => i !== index),
+        },
+      }));
+    }
+  };
 
   // Save (update) the tour.
   const handleSave = async () => {
