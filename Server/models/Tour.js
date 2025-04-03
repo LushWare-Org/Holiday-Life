@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const tourSchema = new mongoose.Schema({
   title: { type: String, required: true },
   price: { type: Number, required: true },
+  person_count: { type: Number, required: true },
   expiry_date: { type: Date, required: true },
   valid_from: { type: Date, required: true },
   valid_to: { type: Date, required: true },

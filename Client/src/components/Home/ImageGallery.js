@@ -257,16 +257,19 @@ const ImageGallery = ({ searchQuery = '', passedCountry = '' }) => {
             >
               <Box sx={{ position: 'relative' }}>
                 <CardMedia
-                  component="img"
-                  height="200"
-                  image={item.tour_image}
-                  alt={item.title}
+                  component="div"
                   sx={{
+                    width: '100%',
+                    paddingTop: '100%', // forces a square aspect ratio
+                    backgroundImage: `url(${item.tour_image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                     cursor: 'pointer',
                     '&:hover': {
                       filter: 'brightness(0.85)',
                     },
                   }}
+                  onClick={() => navigate(`/tours/${item._id}`)}
                 />
                 <Box
                   sx={{

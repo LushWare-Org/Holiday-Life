@@ -27,6 +27,7 @@ const AllTours = () => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
+    person_count: "",
     nights: "", 
     nightsOptions: {},
     expiry_date: "",
@@ -158,6 +159,7 @@ const AllTours = () => {
     setFormData({
       title: tour.title,
       price: tour.price,
+      person_count: tour.person_count,
       nights: baseNightsKey,
       nightsOptions: nightsObject,
       expiry_date: formatDate(tour.expiry_date),
@@ -204,6 +206,7 @@ const AllTours = () => {
     setFormData({
       title: "",
       price: "",
+      person_count: "",
       nights: "",
       nightsOptions: {},
       expiry_date: "",
@@ -594,6 +597,7 @@ const AllTours = () => {
     try {
       const priceInt = parseInt(formData.price, 10) || 0;
       const oldPriceInt = parseInt(formData.oldPrice, 10) || 0;
+      const personCountInt = parseInt(formData.person_count, 10) || 0;
       const parsedFoodCategory = {};
       Object.keys(formData.food_category).forEach((catKey) => {
         const [val1, val2, boolVal] = formData.food_category[catKey];
@@ -615,6 +619,7 @@ const AllTours = () => {
         title: formData.title,
         price: priceInt,
         baseNights: parseInt(formData.nights, 10) || 0,
+        person_count: personCountInt,
         nights: parsedNightsOptions,
         expiry_date: formData.expiry_date,
         valid_from: formData.valid_from,
@@ -784,6 +789,18 @@ const AllTours = () => {
                   type="text"
                   name="oldPrice"
                   value={formData.oldPrice}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                />
+              </div>
+
+              {/* Person Count */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600">Person Count</label>
+                <input
+                  type="number"
+                  name="person_count"
+                  value={formData.person_count}
                   onChange={handleInputChange}
                   className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                 />

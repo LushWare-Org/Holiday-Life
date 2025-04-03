@@ -148,6 +148,8 @@ const TourDetails = () => {
   const nightsCount = selectedNightsKey ? parseInt(selectedNightsKey) : 0;
   const daysCount = nightsCount + 1;
 
+  const personCount = tour ? tour.person_count : 0;
+
   const [openDialog, setOpenDialog] = useState(false);
 
   if (loading) {
@@ -281,10 +283,9 @@ const TourDetails = () => {
 
             <Divider style={{ margin: '0 0', color: 'black' }} />
 
-            {/* Facilities Div inserted under Food Category */}
             {tour.facilities && tour.facilities.length > 0 && (
               <Box sx={{ mb: 2}}>
-                <Typography variant="h6" sx={{ mb: 1 }}>Facilities</Typography>
+                <Typography variant="h6" sx={{ mb: 1 }}>Package Includes</Typography>
                 <Box sx={{ 
                   display: 'grid', 
                   gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', 
@@ -362,6 +363,17 @@ const TourDetails = () => {
                   </Typography>
                 )}
               </Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  {finalOldPrice > totalPrice && (
+                    <Typography sx={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.7)' }}>
+                      {selectedCurrency} {convertPrice(finalOldPrice)}
+                    </Typography>
+                  )}
+                  <Typography variant="h6" sx={{ fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+                    For {personCount} Person(s)
+                  </Typography>
+                </Box>
 
               {/* Expiry Card */}
               <Box
@@ -611,17 +623,24 @@ const TourDetails = () => {
         {/* Tour Images */}
         {tour.tour_image && (
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'flex-start', gap: '20px' }}>
-            <div className="main-image-container" style={{ position: 'relative' }}>
+            <div
+              className="main-image-container"
+              style={{
+                position: 'relative',
+                width: isMobile ? '100%' : '65vw',
+                aspectRatio: '1 / 1', // forces a square container
+                borderRadius: '10px',
+                overflow: 'hidden', // hide any overflow from the image
+              }}
+            >
               <img
                 src={tour.tour_image}
                 alt={tour.title}
                 className="main-image"
                 style={{
-                  width: isMobile ? '100%' : '65vw',
-                  height: 'auto',
-                  borderRadius: '10px',
-                  objectFit: 'cover',
-                  maxHeight: '650px',
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover', // ensures the image covers the container, cropping if needed
                   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                 }}
