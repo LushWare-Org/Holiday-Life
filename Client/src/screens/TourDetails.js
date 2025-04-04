@@ -357,14 +357,7 @@ const TourDetails = () => {
                 <Typography variant="h4" sx={{ fontWeight: 700 }}>
                   {selectedCurrency} {convertPrice(totalPrice)}
                 </Typography>
-                {finalOldPrice > totalPrice && (
-                  <Typography sx={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.7)' }}>
-                    {selectedCurrency} {convertPrice(finalOldPrice)}
-                  </Typography>
-                )}
-              </Box>
-
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                   {finalOldPrice > totalPrice && (
                     <Typography sx={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.7)' }}>
                       {selectedCurrency} {convertPrice(finalOldPrice)}
@@ -374,6 +367,7 @@ const TourDetails = () => {
                     For {personCount} Person(s)
                   </Typography>
                 </Box>
+              </Box>
 
               {/* Expiry Card */}
               <Box
@@ -504,16 +498,16 @@ const TourDetails = () => {
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
                 {selectedCurrency} {convertPrice(totalPrice)}
               </Typography>
-              {finalOldPrice > totalPrice && (
-                <Typography 
-                  sx={{ 
-                    textDecoration: 'line-through',
-                    color: 'rgba(255,255,255,0.7)',
-                  }}
-                >
-                  {selectedCurrency} {convertPrice(finalOldPrice)}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                {finalOldPrice > totalPrice && (
+                  <Typography sx={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.7)' }}>
+                    {selectedCurrency} {convertPrice(finalOldPrice)}
+                  </Typography>
+                )}
+                <Typography variant="h6" sx={{ fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+                  For {personCount} Person(s)
                 </Typography>
-              )}
+              </Box>
             </Box>
 
             {/* Expires On Card */}
