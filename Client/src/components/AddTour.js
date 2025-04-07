@@ -375,6 +375,21 @@ const TourForm = () => {
     });
   };
 
+  const handleFoodCategoryCheckboxChange = (catKey, checked) => {
+    setFormData((prev) => {
+      const oldArray = prev.food_category[catKey] || [0, 0, false];
+      const newArray = [...oldArray];
+      newArray[2] = checked; // the third element is your boolean
+      return {
+        ...prev,
+        food_category: {
+          ...prev.food_category,
+          [catKey]: newArray,
+        },
+      };
+    });
+  };
+
   // Remove a nights option
   const removeNightsOption = (nightsKey, index) => {
     setFormData((prevData) => ({
@@ -682,7 +697,7 @@ const TourForm = () => {
 
         {/* Food Category Pricing */}
         <div>
-          <label className="block text-lg font-medium">Food Category Pricing</label>
+          <label className="block text-lg font-medium">Meal Category Pricing</label>
           {Object.entries(foodCategoryMapping).map(([key, label]) => (
             <div key={key} className="border p-4 rounded-md my-2">
               <h4 className="font-bold">{label}</h4>
@@ -706,6 +721,14 @@ const TourForm = () => {
                     onChange={(e) => handleFoodCategoryChange(key, 1, e.target.value)}
                     className="p-2 border border-gray-300 rounded-md"
                   />
+                </div>
+                <div className="flex items-center space-x-2 mt-4">
+                  <input
+                    type="checkbox"
+                    checked={!!formData.food_category[key]?.[2]}
+                    onChange={(e) => handleFoodCategoryCheckboxChange(key, e.target.checked)}
+                  />
+                  <label className="text-sm">Tour Available?</label>
                 </div>
               </div>
             </div>
