@@ -28,9 +28,9 @@ const TourForm = () => {
     valid_from: "",
     valid_to: "",
     food_category: {
-      0: [0, 0],
-      1: [0, 0],
-      2: [0, 0],
+      0: [0, 0, false],
+      1: [0, 0, false],
+      2: [0, 0, false],
     },
     country: "",
     markets: [],
@@ -476,10 +476,11 @@ const TourForm = () => {
       expiry_date: "",
       valid_from: "",
       valid_to: "",
+      // Updated: now each array is [addPrice, oldAddPrice, isTourAvailable].
       food_category: {
-        0: [0, 0],
-        1: [0, 0],
-        2: [0, 0],
+        0: [0, 0, false],
+        1: [0, 0, false],
+        2: [0, 0, false],
       },
       country: "",
       markets: [],
