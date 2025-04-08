@@ -14,6 +14,7 @@ import axios from 'axios';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import IconButton from '@mui/material/IconButton';
 import { useCurrency } from './CurrencyContext'; 
+import CardMedia from '@mui/material/CardMedia';
 
 function useDeviceType() {
   const [deviceType, setDeviceType] = useState({
