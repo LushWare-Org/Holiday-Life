@@ -1048,7 +1048,7 @@ const TourForm = () => {
             value={formData.facilities}
             onChange={handleInputChange}
             className="mt-0 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="Enter facilities, one per line"
+            placeholder="List of facilities (one per line and use ENTER for each)"
           />
         </div>
 

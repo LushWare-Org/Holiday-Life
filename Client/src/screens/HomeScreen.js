@@ -255,106 +255,126 @@ const HomeScreen = () => {
         </Typography>
         <br />
         <Container>
-          <Grid container spacing={4}>
-            {loading ? (
-              <Typography variant="h6" align="center">
-                Loading tours...
-              </Typography>
-            ) : (
-              tours.map((tour) => (
-                <Grid item xs={12} md={4} key={tour._id}>
-                  <Box
+        <Grid container spacing={4}>
+          {loading ? (
+            <Typography variant="h6" align="center">
+              Loading tours...
+            </Typography>
+          ) : (
+            tours.map((tour) => (
+              <Grid item xs={12} md={4} key={tour._id}>
+                <Box
+                  sx={{
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    backgroundColor: '#fff',
+                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                  }}
+                >
+                  <CardMedia
+                    component="div"
                     sx={{
-                      border: '1px solid #ddd',
-                      borderRadius: '8px',
-                      backgroundColor: '#fff',
-                      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                      width: '100%',
+                      paddingTop: '100%', 
+                      backgroundImage: `url(${tour.tour_image})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      borderRadius: '8px 8px 0 0',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        filter: 'brightness(0.85)',
+                      },
                     }}
-                  >
-                    <img
-                      src={tour.tour_image}
-                      alt={tour.title}
-                      style={{
-                        width: '100%',
-                        height: '200',
-                        objectFit: 'cover',
-                        borderRadius: '8px 8px 0 0',
-                      }}
-                    />
-                    <div style={{ padding: '20px' }}>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                        <Typography variant="h1" fontWeight="bold" fontSize={24}>
-                          {tour.title}
-                        </Typography>
-                      </Box>
-                      <Box>
+                    onClick={() => navigate(`/tours/${tour._id}`)}
+                  />
+                  <div style={{ padding: '20px' }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                      <Typography variant="h1" fontWeight="bold" fontSize={24}>
+                        {tour.title}
+                      </Typography>
+                    </Box>
+                    <Box>
                       <Typography
-                      variant="body1"
-                      sx={{
-                        color: 'text.primary',
-                        fontWeight: 'bold',
-                      }}
-                      gutterBottom
-                      display="flex"
-                      justifyContent="space-between"
-                      mb={1}
-                    >
-                      {currency} {tour.price && !isNaN(tour.price) ? convertPrice(tour.price) : 'N/A'} {' '}
-                      {tour.price && !isNaN(tour.price) && (
-                        <Typography
-                          component="span"
-                          variant="body1"
-                          sx={{ textDecoration: 'line-through', marginLeft: 1, color: 'text.secondary' }}
-                        >
-                          {currency} {convertPrice(tour.oldPrice)}
-                        </Typography>
-                      )}
-                      {tour.price && !isNaN(tour.price) && (
-                        <Typography component="span" variant="body2" color="error" fontWeight="bold" backgroundColor="rgba(76, 175, 80, 0.1)" padding={0.5}>
-                          SAVE {currency} {convertPrice(tour.oldPrice - tour.price)}
-                        </Typography>
-                      )}
-                    </Typography>
-                      </Box>
-                      <Box display="flex" gap={2} mt={3}>
-                        <Button
-                          variant="outlined"
-                          startIcon={<WhatsAppIcon />}
-                          sx={{
+                        variant="body1"
+                        sx={{
+                          color: 'text.primary',
+                          fontWeight: 'bold',
+                        }}
+                        gutterBottom
+                        display="flex"
+                        justifyContent="space-between"
+                        mb={1}
+                      >
+                        {currency}{' '}
+                        {tour.price && !isNaN(tour.price)
+                          ? convertPrice(tour.price)
+                          : 'N/A'}{' '}
+                        {tour.price && !isNaN(tour.price) && (
+                          <Typography
+                            component="span"
+                            variant="body1"
+                            sx={{
+                              textDecoration: 'line-through',
+                              marginLeft: 1,
+                              color: 'text.secondary',
+                            }}
+                          >
+                            {currency} {convertPrice(tour.oldPrice)}
+                          </Typography>
+                        )}
+                        {tour.price && !isNaN(tour.price) && (
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            color="error"
+                            fontWeight="bold"
+                            backgroundColor="rgba(76, 175, 80, 0.1)"
+                            padding={0.5}
+                          >
+                            SAVE {currency} {convertPrice(tour.oldPrice - tour.price)}
+                          </Typography>
+                        )}
+                      </Typography>
+                    </Box>
+                    <Box display="flex" gap={2} mt={3}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<WhatsAppIcon />}
+                        sx={{
+                          borderColor: '#4CAF50',
+                          color: '#4CAF50',
+                          padding: '0px 15px',
+                          '&:hover': {
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
                             borderColor: '#4CAF50',
-                            color: '#4CAF50',
-                            padding: '0px 15px',
-                            '&:hover': {
-                              backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                              borderColor: '#4CAF50',
-                            },
-                          }}
-                          onClick={() => handleWhatsAppClick()}
-                        >
-                          Chat
-                        </Button>
-                        <Button
-                          variant="contained"
-                          fullWidth
-                          sx={{
-                            backgroundColor: '#2196F3',
-                            color: '#fff',
-                            padding: '5px 0',
-                            '&:hover': {
-                              backgroundColor: '#1976D2',
-                            },
-                          }}
-                          onClick={() => navigate(`/tours/${tour._id}`)}
-                        >
-                          View Details
-                        </Button>
-                      </Box>
-                    </div>
-                  </Box>
-                </Grid>
-              ))
-            )}
-          </Grid>
+                          },
+                        }}
+                        onClick={() => handleWhatsAppClick()}
+                      >
+                        Chat
+                      </Button>
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        sx={{
+                          backgroundColor: '#2196F3',
+                          color: '#fff',
+                          padding: '5px 0',
+                          '&:hover': {
+                            backgroundColor: '#1976D2',
+                          },
+                        }}
+                        onClick={() => navigate(`/tours/${tour._id}`)}
+                      >
+                        View Details
+                      </Button>
+                    </Box>
+                  </div>
+                </Box>
+              </Grid>
+            ))
+          )}
+      </Grid>
           <Box display="flex" justifyContent="center" mt={4}>
             <Button variant="contained" color="primary" onClick={handleNavigate}>
               View More Tours

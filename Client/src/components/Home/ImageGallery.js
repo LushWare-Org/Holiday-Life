@@ -260,7 +260,7 @@ const ImageGallery = ({ searchQuery = '', passedCountry = '' }) => {
                   component="div"
                   sx={{
                     width: '100%',
-                    paddingTop: '100%', // forces a square aspect ratio
+                    paddingTop: '100%', 
                     backgroundImage: `url(${item.tour_image})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
