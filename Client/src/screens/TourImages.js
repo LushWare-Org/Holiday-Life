@@ -161,7 +161,8 @@ const TourImages = ({ destinations, activities, hotels, deviceType }) => {
 
   const modalGalleryImageStyle = {
     width: '100%',
-    height: 'auto',
+    aspectRatio: '3 / 2',
+    objectFit: 'cover',
     borderRadius: '8px',
     transition: 'transform 0.3s ease',
   };

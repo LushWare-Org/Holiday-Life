@@ -201,7 +201,12 @@ const Itinerary = ({selectedNightsKey}) => {
                       <img
                         src={dayItem.images[imageIndices[index]]}
                         alt={`Day ${dayItem.day} image`}
-                        className="max-w-full max-h-full object-contain object-center transition-all duration-1000 ease-in-out"
+                        style={{
+                          width: '100%',
+                          aspectRatio: '3 / 2',
+                          objectFit: 'cover',
+                        }}
+                        className="transition-all duration-1000 ease-in-out"
                       />
                       <div
                         className="absolute left-2 top-1/2 transform -translate-y-1/2 text-lg font-bold cursor-pointer z-10 select-none text-white"
