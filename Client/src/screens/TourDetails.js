@@ -125,6 +125,12 @@ const TourDetails = () => {
     }
   }, [tour]);
 
+  // Compute days and nights.
+  const nightsCount = selectedNightsKey ? parseInt(selectedNightsKey) : 0;
+  const daysCount = nightsCount + 1;
+
+  const personCount = tour ? tour.person_count : 1;
+
   // Compute total price based on selections.
   const basePrice = tour ? tour.price : 0;
   const oldBasePrice = tour ? tour.oldPrice : 0;
@@ -132,7 +138,7 @@ const TourDetails = () => {
     ? tour.nights[selectedNightsKey][selectedNightsOption].add_price
     : 0;
   const foodAddPrice = (selectedFoodCategory && tour && tour.food_category)
-    ? tour.food_category[selectedFoodCategory][0]
+    ? tour.food_category[selectedFoodCategory][0] * nightsCount * personCount
     : 0;
   const totalPrice = basePrice + nightsAddPrice + foodAddPrice;
 
@@ -140,15 +146,10 @@ const TourDetails = () => {
     ? tour.nights[selectedNightsKey][selectedNightsOption].old_add_price
     : 0;
   const foodOldPrice = (selectedFoodCategory && tour && tour.food_category)
-    ? tour.food_category[selectedFoodCategory][1]
+    ? tour.food_category[selectedFoodCategory][1] * nightsCount * personCount
     : 0;
   const finalOldPrice = oldBasePrice + nightsOldPrice + foodOldPrice;
 
-  // Compute days and nights.
-  const nightsCount = selectedNightsKey ? parseInt(selectedNightsKey) : 0;
-  const daysCount = nightsCount + 1;
-
-  const personCount = tour ? tour.person_count : 0;
 
   const [openDialog, setOpenDialog] = useState(false);
 

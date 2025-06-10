@@ -704,7 +704,7 @@ const TourForm = () => {
               <h4 className="font-bold">{label}</h4>
               <div className="flex space-x-4 mt-2">
                 <div>
-                  <label className="block text-sm">Add Price</label>
+                  <label className="block text-sm">Add Price (Per Night / Per Person)</label>
                   <input
                     type="number"
                     name={`food_category_${key}_add_price`}
@@ -714,7 +714,7 @@ const TourForm = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm">Old Add Price</label>
+                  <label className="block text-sm">Old Add Price (Per Night / Per Person)</label>
                   <input
                     type="number"
                     name={`food_category_${key}_old_add_price`}
