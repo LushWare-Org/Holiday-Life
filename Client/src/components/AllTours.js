@@ -849,7 +849,7 @@ const AllTours = () => {
                     <h4 className="font-bold">{label}</h4>
                     <div className="flex space-x-4 mt-2">
                       <div>
-                        <label className="block text-sm text-gray-500">Additional Price</label>
+                        <label className="block text-sm text-gray-500">Add Price (Per Night / Per Person)</label>
                         <input
                           type="number"
                           value={formData.food_category[key]?.[0] || ""}
@@ -858,7 +858,7 @@ const AllTours = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-500">Old Additional Price</label>
+                        <label className="block text-sm text-gray-500">Old Add Price (Per Night / Per Person)</label>
                         <input
                           type="number"
                           value={formData.food_category[key]?.[1] || ""}
@@ -1082,11 +1082,11 @@ const AllTours = () => {
                         {opt.option}
                         <br />
                         <span className="text-gray-500">
-                          Additional Price:{" "}
+                          Add Price:{" "}
                           <span className="bg-gray-300/80 text-gray-600 p-1">
                             {opt.add_price}
                           </span>
-                          , Old Additional Price:{" "}
+                          , Old Add Price:{" "}
                           <span className="bg-gray-300/80 text-gray-600 p-1">
                             {opt.old_add_price}
                           </span>
