@@ -33,10 +33,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/tours', tourRoutes);
-app.use('/inquiries', inquireRoutes);
-app.use('/users', userRoutes);
-app.use('/contact', contactRoutes);
+app.use('/api/tours', tourRoutes);
+app.use('/api/inquiries', inquireRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Put your MongoDB connection URL here, privately.
 // Do not share the URL or password in chat.
