@@ -12,7 +12,7 @@ import Itinerary from './screens/Itinerary';
 import { CurrencyProvider } from './screens/CurrencyContext';
 import axios from 'axios';
 
-axios.defaults.baseURL = "https://holidaylife.travel/api";
+axios.defaults.baseURL = "https://holidaylife.online";
 
 const App = () => {
   return (
